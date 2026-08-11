@@ -1,4 +1,5 @@
 import { SaxesParser } from 'saxes';
+import { corpusEntities, xmlEntityNames } from './entities.js';
 
 /**
  * A minimal element tree, shaped for the traversal that consumes it.
@@ -72,6 +73,32 @@ export function findElements(root: TeiElement, name: string): TeiElement[] {
   return all.concat(descendants(root).filter((element) => element.name === name));
 }
 
+/** The entity settings `parseXml` reads out of `ParseOptions`. */
+export type EntityOptions = {
+  corpusEntities?: boolean;
+  entities?: Record<string, string>;
+};
+
+/**
+ * Teach the parser the entity names the document's DTD would have defined.
+ *
+ * Replacement text is inserted verbatim and never rescanned, so a value
+ * containing `&other;` stays those seven characters rather than expanding
+ * again. That is a limitation of resolving entities without a DTD processor,
+ * and it is the safe direction: nothing a caller supplies can become markup.
+ */
+function defineEntities(parser: SaxesParser, options: EntityOptions): void {
+  if (options.corpusEntities !== false) {
+    Object.assign(parser.ENTITIES, corpusEntities);
+  }
+  for (const [name, value] of Object.entries(options.entities ?? {})) {
+    if (xmlEntityNames.includes(name)) {
+      throw new Error(`the XML entity &${name}; is defined by XML itself and cannot be redefined`);
+    }
+    parser.ENTITIES[name] = value;
+  }
+}
+
 /**
  * Parse XML into a `TeiElement` tree.
  *
@@ -79,8 +106,9 @@ export function findElements(root: TeiElement, name: string): TeiElement[] {
  * a truncated download is the most likely bad input, and "unexpected end of
  * input at 4211:18" is worth more than "cannot read property of undefined".
  */
-export function parseXml(xml: string): TeiElement {
+export function parseXml(xml: string, options: EntityOptions = {}): TeiElement {
   const parser = new SaxesParser({ xmlns: true, position: true });
+  defineEntities(parser, options);
   let root: TeiElement | null = null;
   let current: TeiElement | null = null;
   let failure: Error | null = null;

@@ -5,8 +5,9 @@ already knew about, which makes them a poor witness to how the parser behaves on
 This document records a run over **every text in all three corpora — 3,503 files, 898 MB** — what it
 found, and how to repeat it.
 
-Nothing here changed the parser. This was a measurement exercise; the findings are recorded as
-recommendations, not applied.
+The run itself changed nothing: it was a measurement exercise, and its findings were recorded as
+recommendations. Findings **1 and 2 have since been applied and the corpus re-run** — the blockquote on
+each carries the measured effect, which for finding 2 was not the effect predicted.
 
 ## Method
 
@@ -151,7 +152,56 @@ contain a numbered subsection, so the parser emits 2 units and drops nine tenths
 
 This is the only unambiguous correctness defect the run found, and no exception reports it.
 
-### 2. Undefined entities — a real limitation
+### 2. Undefined entities — a real limitation — **fixed in 0.2.0**
+
+> **Fixed — and it recovers nothing. Measured, not predicted.** The entity names this corpus actually
+> uses now ship compiled into the package as `src/entities.ts` and are installed on the parser before
+> it reads a document, so 26 of the 27 files below get past the entity barrier with no DTD and no
+> network. Not one of them parses.
+>
+> The table is **48 names**, from a census of every `&name;` appearing as live character data across
+> the three corpora — not the 2,120-name HTML set, which was the first attempt and cost 43 KB to
+> define 2,072 names no edition writes. Measuring beat guessing twice over: the census found 42 names
+> beyond the six counted below, and it found one the HTML set gets **wrong**. `&cdot;` is `ċ` in HTML;
+> in `phi0978.phi001.perseus-eng1`, Pliny's _Natural History_, it is the decimal point of a printed
+> astronomical table (`87&cdot;9705`, 20 occurrences), so the shipped value is U+00B7 MIDDLE DOT. That
+> file is itself one of the 26 that fail anyway, so the correction changes no output today — it
+> changes what the table would produce the day that file becomes readable.
+>
+> Swapping the 2,120-name table for the 48-name one was verified by re-running the corpus: **zero
+> differences** across all 3,503 files — same outcomes, same 1,036,211 units, same coverage, same
+> errors. 43 KB became 3.4 KB.
+>
+> Three names in the census are not characters at all — `&Perseus.OCR;`, `&prose.eng.encode;` and
+> `&Perseus.publish;` are markup macros from Perseus's DTD. The first two appear only inside comments;
+> the third is the one file below that still fails.
+>
+> Re-running the whole corpus: **3,503 files, 3,267 parsed, 236 failed** — the same counts as before
+> the change, the same 1,036,211 units, and byte-identical coverage and invariants on every file that
+> already parsed. The 26 simply moved to a different rejection:
+>
+> |   n | Where the 26 went                                                                   |
+> | --: | ----------------------------------------------------------------------------------- |
+> |  23 | no citation scheme — the pre-CTS class of finding 3                                 |
+> |   2 | the same citation twice — finding 4                                                 |
+> |   1 | genuinely malformed XML (`unexpected close tag`), which the entity error had hidden |
+>
+> The cause is a population overlap the original run could not see. **26 of the 27 are TEI P4
+> documents** — `<TEI.2>` root, `<refsDecl doctype="TEI.2">` with `<state/>` children — and **all 57
+> P4 documents in the corpus fail, entities or not**. The editions old enough to write `&aelig;` are
+> the same editions old enough to predate CTS citation. Reading them is finding 3's problem, not this
+> one.
+>
+> What the change does buy: those 26 now report why they are actually unusable instead of blaming
+> well-formedness, which is how the masked malformed file surfaced. And a CTS-conformant document that
+> merely uses `&mdash;` — which exists outside this corpus — now reads.
+>
+> The 27th is a different animal. `stoa0058.stoa025.perseus-eng1` fails on `&Perseus.publish;`, a
+> boilerplate _markup_ macro from Perseus's own DTD, reached through a parameter entity in the
+> document's internal subset. No character table can hold it: its replacement is elements, and
+> replacement text is never rescanned as markup. That one stays out of reach by design.
+>
+> The description below is of the limitation as found.
 
 27 files fail to parse at all. 26 of them declare an **external DTD** and use HTML/ISO entities that
 the DTD would define: `&aelig;` (7,676 occurrences), `&mdash;` (5,674), `&eacute;` (1,710), `&AElig;`,
@@ -162,6 +212,9 @@ Failing loudly is the right behaviour — the alternative, passing `&aelig;` thr
 silently corrupts the edition. But 27 unreadable files is a gap worth closing.
 
 ### 3. The largest failure class is out of scope, and the README overclaims
+
+> Now **222**, after the entity table of finding 2 let 23 more documents through to their real
+> rejection. The class grew; nothing about it changed.
 
 199 failures — 82% of all failures, and the entire reason latinLit scores 65.9% — are documents with
 no citable structure this parser can see. Of those, **170 use the pre-CTS `<refsDecl><refState>`
@@ -235,7 +288,8 @@ rather than counted.
 
 ## Recommendations
 
-Not applied. In rough order of value:
+In rough order of value, as recorded at the time of the run. **1 and 2 have since been applied** — see
+the notes on those findings above; the rest are not:
 
 1. **Emit units at the shallower level when the deepest is absent** (finding 1). Falling back per
    division rather than per document would recover the lost text in all 21 affected files. This is

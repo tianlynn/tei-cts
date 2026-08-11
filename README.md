@@ -144,6 +144,37 @@ by punctuation. It is not rare — 11,158 occurrences in the Iliad, 8,941 in the
 Plato. Latin editions use U+0027 instead, and sparingly. `tei-cts` passes the character through
 untouched, deliberately; handling it is a decision only you can make.
 
+## Entities
+
+XML predefines five named escapes — `&amp;` `&lt;` `&gt;` `&quot;` `&apos;` — and nothing else. A
+document using `&aelig;`, `&mdash;` or `&eacute;` has to declare them, and TEI editions declare them
+in a DTD sitting on a web server, which nothing here fetches. Left alone, an XML parser treats the
+first such name as malformed and rejects the file whole.
+
+So the names are compiled into the package and handed to the parser before it reads anything. No
+network, no file access, one property lookup per entity. The table is **48 names, measured** — every
+entity that appears as live text anywhere in canonical-greekLit, canonical-latinLit and First1KGreek,
+and nothing else. Shipping the full HTML set instead would have cost 43 KB to define 2,072 names no
+edition writes, and would have got `&cdot;` wrong: HTML reads it as `ċ`, while the corpus uses it as
+the decimal point of a printed table, `87&cdot;9705`.
+
+Do not expect this to rescue old Perseus files. Of the 3,503 corpus texts, 27 failed on an entity, and
+resolving them recovers **none** of them: 26 are TEI P4 documents that predate CTS citation, so they
+now fail for that reason instead — accurately, rather than by blaming well-formedness. The table earns
+its place on CTS-conformant documents that merely use `&mdash;`. See
+[`docs/corpus-testing.md`](docs/corpus-testing.md).
+
+Names outside the table are rejected, loudly — including the older convention that spells Greek
+letters `&agr;`, `&bgr;`. Supply those yourself, or turn the table off for strict XML:
+
+```ts
+parseTeiDocument(xml, { entities: { agr: 'α', bgr: 'β' } }); // merged over the table
+parseTeiDocument(xml, { corpusEntities: false }); // only the five XML names
+```
+
+Replacement text is inserted as text and never rescanned, so it can introduce neither markup nor
+another entity, and the five XML names cannot be redefined.
+
 ## What this does not do
 
 - **Not a general TEI parser.** It targets the CTS/CapiTainS profile. TEI has some 600 elements and no
@@ -151,7 +182,8 @@ untouched, deliberately; handling it is a decision only you can make.
 - **No tokenization, lemmatization or sentence segmentation.** Those are language problems, not markup
   problems.
 - **No CTS range resolution.** Every unit in the document comes back; slicing `1.1-1.10` is one `filter`.
-- **No network and no file access.**
+- **No network and no file access.** Which means no DTD processing either: an external DTD is never
+  fetched, and entity names are resolved from the shipped table above instead.
 - **Milestone-anchored citation** — schemes that cite the text _between_ two markers, as some Plato and
   Aristotle editions do — is not supported. Such a scheme is detected and falls back to inference
   rather than producing subtly wrong units.

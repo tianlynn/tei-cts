@@ -6,6 +6,23 @@ All notable changes to this project are documented here. The format follows
 
 ## [0.2.0] — unreleased
 
+### Added
+
+- **Named entities resolve without a DTD.** Documents declaring `&aelig;`, `&mdash;`, `&eacute;` and
+  friends in an external DTD were rejected whole as malformed XML, because the DTD is never fetched —
+  27 of the 3,503 texts in the corpus run failed that way. The **48 entity names that appear as live
+  text anywhere in the three corpora** now ship compiled into the package (`src/entities.ts`,
+  generated from a census of them) and are installed on the parser before it reads a document. Still
+  no network and no file access. Re-running the corpus measured the effect honestly: **no additional
+  file parses**. 26 of the 27 are TEI P4 documents that predate CTS citation, so they now fail with
+  that diagnosis rather than a well-formedness error — which is how one genuinely malformed file,
+  previously masked, came to light. The gain is accurate errors here, and readable documents outside
+  this corpus.
+- **`corpusEntities` and `entities` options.** `corpusEntities: false` restores strict XML — the five
+  names XML defines and nothing else. `entities: { agr: 'α' }` supplies names the table does not
+  carry, such as the older convention for Greek letters, and wins over it. Replacement text is
+  inserted as text and never rescanned, and the five XML names cannot be redefined.
+
 ### Fixed
 
 - **Silent text loss on ragged hierarchies.** Units were emitted only where a document's full chain of

@@ -123,6 +123,32 @@ describe('parseTeiDocument', () => {
   });
 });
 
+describe('entities the document declares in an unreachable DTD', () => {
+  /** What the 27 latinLit files that fail on entities look like: a DTD nobody can fetch. */
+  const withDoctype = (body: string) =>
+    `<!DOCTYPE TEI PUBLIC "-//TEI P4//DTD Main Document Type//EN" "teixlite.dtd">${document({ body })}`;
+
+  it('reads a document whose entities only the external DTD defines', () => {
+    const doc = parseTeiDocument(withDoctype('<div n="1"><p>C&aelig;sar &mdash; Gallia</p></div>'));
+
+    expect(doc.units.map((unit) => unit.text)).toEqual(['Cæsar — Gallia']);
+  });
+
+  it('fails the way it used to when the table is turned off', () => {
+    const xml = withDoctype('<div n="1"><p>C&aelig;sar</p></div>');
+
+    expect(() => parseTeiDocument(xml, { corpusEntities: false })).toThrow(/undefined entity/);
+  });
+
+  it('takes extra definitions for names outside the shipped table', () => {
+    const doc = parseTeiDocument(withDoctype('<div n="1"><p>&agr;&bgr;</p></div>'), {
+      entities: { agr: 'α', bgr: 'β' },
+    });
+
+    expect(doc.units.map((unit) => unit.text)).toEqual(['αβ']);
+  });
+});
+
 describe('ragged hierarchies', () => {
   const twoLevel = (body: string) =>
     document({

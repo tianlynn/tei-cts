@@ -100,4 +100,23 @@ export type ParseOptions = {
   normalize?: 'NFC' | 'NFD' | 'none';
   /** Override the separator that joins citation levels. Defaults to '.'. */
   citationSeparator?: string;
+  /**
+   * Resolve the 48 named entities the Perseus corpora actually use — `&aelig;`,
+   * `&mdash;`, `&eacute;` — which XML does not predefine. Defaults to `true`.
+   *
+   * Editions that use them declare them in an external DTD, which nothing here
+   * fetches, so without the shipped table one `&aelig;` rejects a whole file as
+   * malformed. Set `false` for strict XML: only `amp`, `lt`, `gt`, `quot` and
+   * `apos`, plus whatever `entities` adds.
+   */
+  corpusEntities?: boolean;
+  /**
+   * Extra entity definitions, name (no `&` or `;`) to the text it stands for.
+   * Merged over the shipped table, and the way to supply a name the table does
+   * not carry — `{ agr: 'α' }` for the old convention for Greek letters.
+   *
+   * Replacement text is inserted as text and never rescanned, so it cannot
+   * introduce markup or another entity. The five XML names are rejected.
+   */
+  entities?: Record<string, string>;
 };

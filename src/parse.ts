@@ -34,7 +34,7 @@ function speakerFor(node: TeiElement): string | null {
 }
 
 export function parseTeiDocument(xml: string, options: ParseOptions = {}): TeiDocument {
-  const root = parseXml(xml);
+  const root = parseXml(xml, options);
   const separator = options.citationSeparator ?? '.';
   const metadata = readMetadata(root);
 
