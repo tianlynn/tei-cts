@@ -106,13 +106,22 @@ export type ParseOptions = {
    *
    * Editions that use them declare them in an external DTD, which nothing here
    * fetches, so without the shipped table one `&aelig;` rejects a whole file as
-   * malformed. Also expands the handful of Perseus entities whose replacement is
-   * markup rather than characters, such as `&Perseus.publish;`.
-   *
-   * Set `false` for strict XML: only `amp`, `lt`, `gt`, `quot` and `apos`, plus
-   * whatever `entities` adds, and no markup expansion.
+   * malformed. Set `false` for strict XML: only `amp`, `lt`, `gt`, `quot` and
+   * `apos`, plus whatever `entities` adds.
    */
   corpusEntities?: boolean;
+  /**
+   * Expand the known Perseus DTD macros — entities whose replacement is markup
+   * rather than characters, such as `&Perseus.publish;`, the publication
+   * statement shared by every Tufts edition. Defaults to `true`.
+   *
+   * This is the one thing that rewrites the document, by substituting the
+   * declared markup before parsing, since an entity resolved to text can never
+   * become an element. Set `false` to guarantee the parser sees your XML exactly
+   * as you passed it; a document referencing a macro then fails as malformed,
+   * which is what it is without its DTD.
+   */
+  corpusDtdMacro?: boolean;
   /**
    * Extra entity definitions, name (no `&` or `;`) to the text it stands for.
    * Merged over the shipped table, and the way to supply a name the table does

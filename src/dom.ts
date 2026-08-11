@@ -1,5 +1,5 @@
 import { SaxesParser } from 'saxes';
-import { corpusEntities, markupEntities, xmlEntityNames } from './entities.js';
+import { corpusDtdMacros, corpusEntities, xmlEntityNames } from './entities.js';
 
 /**
  * A minimal element tree, shaped for the traversal that consumes it.
@@ -76,6 +76,7 @@ export function findElements(root: TeiElement, name: string): TeiElement[] {
 /** The entity settings `parseXml` reads out of `ParseOptions`. */
 export type EntityOptions = {
   corpusEntities?: boolean;
+  corpusDtdMacro?: boolean;
   entities?: Record<string, string>;
 };
 
@@ -103,7 +104,8 @@ function defineEntities(parser: SaxesParser, options: EntityOptions): void {
 const UNPARSED = /<!--[\s\S]*?-->|<!\[CDATA\[[\s\S]*?\]\]>/g;
 
 /**
- * Expand entities whose replacement is markup, before the parser sees them.
+ * Expand the DTD macros — entities whose replacement is markup — before the
+ * parser sees them.
  *
  * The parser has no way to do this: it resolves an entity to text, and text is
  * where the expansion has to stop or a document could rewrite its own structure.
@@ -113,16 +115,20 @@ const UNPARSED = /<!--[\s\S]*?-->|<!\[CDATA\[[\s\S]*?\]\]>/g;
  * is then parsed as ordinary markup, and a malformed replacement fails as
  * malformed XML rather than corrupting the tree.
  *
+ * This is the only place the package rewrites its input, which is why it has its
+ * own switch rather than riding along with the entity table: `corpusDtdMacro:
+ * false` guarantees the document reaches the parser exactly as it arrived.
+ *
  * Comments and CDATA are stepped over: a reference inside them is not one, and
  * 27 files in the corpus mention `&Perseus.OCR;` in a comment.
  */
-function expandMarkupEntities(xml: string, entities: Record<string, string>): string {
-  const names = Object.keys(entities);
+function expandMacros(xml: string, macros: Record<string, string>): string {
+  const names = Object.keys(macros);
   if (names.length === 0 || !names.some((name) => xml.includes(`&${name};`))) return xml;
 
   const reference = new RegExp(`&(${names.map((name) => name.replace(/[.]/g, '\\.')).join('|')});`, 'g');
   const expand = (text: string): string =>
-    text.replace(reference, (match, name: string) => entities[name] ?? match);
+    text.replace(reference, (match, name: string) => macros[name] ?? match);
 
   let out = '';
   let at = 0;
@@ -144,7 +150,7 @@ function expandMarkupEntities(xml: string, entities: Record<string, string>): st
 export function parseXml(xml: string, options: EntityOptions = {}): TeiElement {
   const parser = new SaxesParser({ xmlns: true, position: true });
   defineEntities(parser, options);
-  const source = options.corpusEntities === false ? xml : expandMarkupEntities(xml, markupEntities);
+  const source = options.corpusDtdMacro === false ? xml : expandMacros(xml, corpusDtdMacros);
   let root: TeiElement | null = null;
   let current: TeiElement | null = null;
   let failure: Error | null = null;

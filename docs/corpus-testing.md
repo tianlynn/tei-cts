@@ -177,10 +177,24 @@ This is the only unambiguous correctness defect the run found, and no exception 
 > `&Perseus.OCR;` and `&prose.eng.encode;` are boilerplate _markup_ from Perseus's DTD —
 > `&Perseus.publish;` is the publication statement shared by every Tufts edition. A character table
 > cannot hold an element, so these are expanded into the document before parsing, stepping over
-> comments and CDATA (the first two appear only in comments). With that, the undefined-entity class
-> is **empty**: `stoa0058.stoa025.perseus-eng1` joined the pre-CTS class where it belongs, and **no
+> comments and CDATA (the last two appear only in comments). With that, the undefined-entity class is
+> **empty**: `stoa0058.stoa025.perseus-eng1` joined the pre-CTS class where it belongs, and **no
 > document in the three corpora fails at the XML layer any more**. All 236 remaining failures are
 > about citation, not markup.
+>
+> The two behaviours switch off separately — `corpusEntities` configures the parser, `corpusDtdMacro`
+> rewrites the document — and running the corpus under each combination shows they partition the
+> problem exactly:
+>
+> | Setting                 | Entity failures |
+> | ----------------------- | --------------: |
+> | both on (default)       |           **0** |
+> | `corpusEntities: false` |              26 |
+> | `corpusDtdMacro: false` |               1 |
+> | both off                |          **27** |
+>
+> 26 + 1 = the original 27, and parsed count and unit total are identical in all four rows: the
+> switches change which error a file reports, not what this corpus yields.
 >
 > Re-running the whole corpus: **3,503 files, 3,267 parsed, 236 failed** — the same counts as before
 > the change, the same 1,036,211 units, and byte-identical coverage and invariants on every file that

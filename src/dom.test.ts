@@ -145,10 +145,53 @@ describe('entities', () => {
     expect(elementChildren(body).map((element) => element.name)).toEqual(['l']);
   });
 
-  it('does not expand markup macros with the table turned off', () => {
-    const xml = `<TEI xmlns="${TEI_NS}"><teiHeader>&Perseus.publish;</teiHeader></TEI>`;
+  describe('the two switches are independent', () => {
+    const both = `<TEI xmlns="${TEI_NS}"><teiHeader>&Perseus.publish;</teiHeader><text><body><l>C&aelig;sar</l></body></text></TEI>`;
+    const read = (options: Parameters<typeof parseXml>[1]) => {
+      const root = parseXml(both, options);
+      return {
+        macro: findElement(root, 'publicationStmt') !== null,
+        entity: (findElement(root, 'l')!.children[0] as { value: string }).value,
+      };
+    };
 
-    expect(() => parseXml(xml, { corpusEntities: false })).toThrow(/undefined entity/);
+    it('expands both by default', () => {
+      expect(read({})).toEqual({ macro: true, entity: 'Cæsar' });
+    });
+
+    it('keeps the macro when only the entity table is off', () => {
+      expect(() => read({ corpusEntities: false })).toThrow(/undefined entity/);
+      expect(read({ corpusEntities: false, entities: { aelig: 'ae' } })).toEqual({
+        macro: true,
+        entity: 'Caesar',
+      });
+    });
+
+    it('keeps the entity table when only macro expansion is off', () => {
+      expect(() => read({ corpusDtdMacro: false })).toThrow(/undefined entity/);
+      expect(read({ corpusDtdMacro: false, entities: { 'Perseus.publish': '' } })).toEqual({
+        macro: false,
+        entity: 'Cæsar',
+      });
+    });
+
+    it('special-cases nothing with both off', () => {
+      const plain = `<TEI xmlns="${TEI_NS}"><text><body><l>a &amp; b</l></body></text></TEI>`;
+      const strict = { corpusEntities: false, corpusDtdMacro: false } as const;
+
+      expect(parseXml(plain, strict)).toBeTruthy();
+      expect(() => parseXml(both, strict)).toThrow(/undefined entity/);
+    });
+
+    it('leaves the document byte-identical when macro expansion is off', () => {
+      // The only rewrite this package performs, and the switch that removes it.
+      const withMacro = `<TEI xmlns="${TEI_NS}"><teiHeader>&Perseus.publish;</teiHeader></TEI>`;
+
+      expect(() => parseXml(withMacro, { corpusDtdMacro: false })).toThrow(/undefined entity/);
+      expect(findElement(parseXml(withMacro), 'publisher')!.children).toEqual([
+        { type: 'text', value: 'Trustees of Tufts University' },
+      ]);
+    });
   });
 
   it('does not rescan replacement text for markup or further entities', () => {

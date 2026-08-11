@@ -24,11 +24,14 @@ All notable changes to this project are documented here. The format follows
   it is parsed, stepping over comments and CDATA. With this, **no document in the three corpora fails
   at the XML layer any more**: the undefined-entity class is empty, and the last file in it joined the
   pre-CTS class it truly belongs to.
-- **`corpusEntities` and `entities` options.** `corpusEntities: false` restores strict XML — the five
-  names XML defines, no shipped table and no macro expansion. `entities: { agr: 'α' }` supplies names
-  the table does not carry, such as the older convention for Greek letters, and wins over it.
-  Replacement text is inserted as text and never rescanned, and the five XML names cannot be
-  redefined.
+- **`corpusEntities`, `corpusDtdMacro` and `entities` options.** The two shipped behaviours switch off
+  independently, because they differ in kind: `corpusEntities: false` drops the 48-name table and
+  configures nothing on the parser, while `corpusDtdMacro: false` drops the macro expansion, which is
+  the only thing that rewrites the document — turn it off and the parser sees the exact bytes it was
+  given. With both off nothing is special-cased: the five XML names and whatever `entities` adds.
+  `entities: { agr: 'α' }` supplies names the table does not carry, such as the older convention for
+  Greek letters, and wins over it; replacement text is inserted as text and never rescanned, and the
+  five XML names cannot be redefined.
 - **Entity values verified against the editions' own DTDs.** All 48 names are declared in the chain
   from `PersProse.dtd` to the OASIS `iso-*.ent` sets, and all 48 values agree with it. That check
   reversed one earlier decision: `&cdot;` ships as `ċ`, its declared value, not the `·` that Pliny's

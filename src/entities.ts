@@ -111,8 +111,13 @@ export const corpusEntities: Readonly<Record<string, string>> = Object.freeze({
  *
  * Values are the declarations themselves, read from PersTeiHead.dtd. Whitespace
  * is normalised; nothing else is touched.
+ *
+ * Expanding them is the only thing that rewrites a document, so it has its own
+ * switch, `corpusDtdMacro: false`, separate from the character table above.
+ * `Perseus.OCR` never expands in the corpus — its 27 occurrences are all inside
+ * comments — but it is a real declaration and a document may yet use it live.
  */
-export const markupEntities: Readonly<Record<string, string>> = Object.freeze({
+export const corpusDtdMacros: Readonly<Record<string, string>> = Object.freeze({
   'Perseus.publish':
     '<publicationStmt>' +
     '<publisher>Trustees of Tufts University</publisher>' +

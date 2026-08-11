@@ -177,8 +177,15 @@ letters `&agr;`, `&bgr;`. Supply those yourself, or turn the table off for stric
 
 ```ts
 parseTeiDocument(xml, { entities: { agr: 'α', bgr: 'β' } }); // merged over the table
-parseTeiDocument(xml, { corpusEntities: false }); // only the five XML names
+parseTeiDocument(xml, { corpusEntities: false }); // no shipped names
+parseTeiDocument(xml, { corpusDtdMacro: false }); // no macro expansion
 ```
+
+The two switches are independent, because they do different things. `corpusEntities` configures the
+parser and leaves your document alone; `corpusDtdMacro` rewrites the document before parsing, which is
+the only place this package touches its input — turn it off and the parser sees exactly the bytes you
+passed. With both off nothing is special-cased at all: the five XML names, plus whatever `entities`
+adds, and any document relying on its DTD fails as malformed, which without that DTD is what it is.
 
 Replacement text is inserted as text and never rescanned, so it can introduce neither markup nor
 another entity, and the five XML names cannot be redefined.
@@ -190,8 +197,10 @@ another entity, and the five XML names cannot be redefined.
 - **No tokenization, lemmatization or sentence segmentation.** Those are language problems, not markup
   problems.
 - **No CTS range resolution.** Every unit in the document comes back; slicing `1.1-1.10` is one `filter`.
-- **No network and no file access.** Which means no DTD processing either: an external DTD is never
-  fetched, and entity names are resolved from the shipped table above instead.
+- **No network and no file access.** Which means **no DTD processing at all**: a `<!DOCTYPE>` is not
+  read, an external DTD is never fetched, and a document's own internal subset is not interpreted.
+  What the DTDs declare arrives here as the two compiled-in tables above, sourced offline and
+  switchable, not as anything the parser does at runtime.
 - **Milestone-anchored citation** — schemes that cite the text _between_ two markers, as some Plato and
   Aristotle editions do — is not supported. Such a scheme is detected and falls back to inference
   rather than producing subtly wrong units.
