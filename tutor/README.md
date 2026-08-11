@@ -31,7 +31,7 @@ Each part has one grammatical shape, so the title tells you what kind of chapter
 
 ### Part I — The model
 
-_Status: 01 and 02 written; 03 and 04 outlined._
+_Status: complete._
 
 | #                                     | Chapter                   | What it covers                                                                                                                                        |
 | ------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
