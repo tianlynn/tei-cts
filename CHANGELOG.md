@@ -18,10 +18,22 @@ All notable changes to this project are documented here. The format follows
   that diagnosis rather than a well-formedness error — which is how one genuinely malformed file,
   previously masked, came to light. The gain is accurate errors here, and readable documents outside
   this corpus.
+- **Markup macros expand.** Perseus keeps shared boilerplate in its DTD as entities whose replacement
+  is markup — `&Perseus.publish;` is the publication statement common to every Tufts edition. An
+  entity resolved to text can never become an element, so these are expanded into the document before
+  it is parsed, stepping over comments and CDATA. With this, **no document in the three corpora fails
+  at the XML layer any more**: the undefined-entity class is empty, and the last file in it joined the
+  pre-CTS class it truly belongs to.
 - **`corpusEntities` and `entities` options.** `corpusEntities: false` restores strict XML — the five
-  names XML defines and nothing else. `entities: { agr: 'α' }` supplies names the table does not
-  carry, such as the older convention for Greek letters, and wins over it. Replacement text is
-  inserted as text and never rescanned, and the five XML names cannot be redefined.
+  names XML defines, no shipped table and no macro expansion. `entities: { agr: 'α' }` supplies names
+  the table does not carry, such as the older convention for Greek letters, and wins over it.
+  Replacement text is inserted as text and never rescanned, and the five XML names cannot be
+  redefined.
+- **Entity values verified against the editions' own DTDs.** All 48 names are declared in the chain
+  from `PersProse.dtd` to the OASIS `iso-*.ent` sets, and all 48 values agree with it. That check
+  reversed one earlier decision: `&cdot;` ships as `ċ`, its declared value, not the `·` that Pliny's
+  astronomical tables evidently intend — the declaration is the authority, and
+  `entities: { cdot: '·' }` is the override.
 
 ### Fixed
 

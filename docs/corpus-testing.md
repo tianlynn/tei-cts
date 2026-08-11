@@ -162,20 +162,25 @@ This is the only unambiguous correctness defect the run found, and no exception 
 >
 > The table is **48 names**, from a census of every `&name;` appearing as live character data across
 > the three corpora — not the 2,120-name HTML set, which was the first attempt and cost 43 KB to
-> define 2,072 names no edition writes. Measuring beat guessing twice over: the census found 42 names
-> beyond the six counted below, and it found one the HTML set gets **wrong**. `&cdot;` is `ċ` in HTML;
-> in `phi0978.phi001.perseus-eng1`, Pliny's _Natural History_, it is the decimal point of a printed
-> astronomical table (`87&cdot;9705`, 20 occurrences), so the shipped value is U+00B7 MIDDLE DOT. That
-> file is itself one of the 26 that fail anyway, so the correction changes no output today — it
-> changes what the table would produce the day that file becomes readable.
+> define 2,072 names no edition writes. Swapping one for the other was verified by re-running the
+> corpus: **zero differences** across all 3,503 files. 43 KB became 3.4 KB.
 >
-> Swapping the 2,120-name table for the 48-name one was verified by re-running the corpus: **zero
-> differences** across all 3,503 files — same outcomes, same 1,036,211 units, same coverage, same
-> errors. 43 KB became 3.4 KB.
+> **The values were then checked against the editions' own DTDs**, which are still served: the chain
+> from `PersProse.dtd` through `PersTeiCommon.dtd` to the OASIS `iso-*.ent` files declares 612
+> entities. All 48 names appear in it and all 48 values match. That check also reversed a decision
+> made here earlier: `&cdot;` was shipped as `·` on the reasoning that HTML's `ċ` could not be what
+> `87&cdot;9705` means in Pliny's astronomical tables. The DTD says `ċ` too — so the edition
+> contradicts its own declaration, and the declaration is what this parser follows, for entities as
+> for citations. `entities: { cdot: '·' }` is the override for anyone who wants the intent.
 >
-> Three names in the census are not characters at all — `&Perseus.OCR;`, `&prose.eng.encode;` and
-> `&Perseus.publish;` are markup macros from Perseus's DTD. The first two appear only inside comments;
-> the third is the one file below that still fails.
+> **Markup macros.** Three names in the census are not characters: `&Perseus.publish;`,
+> `&Perseus.OCR;` and `&prose.eng.encode;` are boilerplate _markup_ from Perseus's DTD —
+> `&Perseus.publish;` is the publication statement shared by every Tufts edition. A character table
+> cannot hold an element, so these are expanded into the document before parsing, stepping over
+> comments and CDATA (the first two appear only in comments). With that, the undefined-entity class
+> is **empty**: `stoa0058.stoa025.perseus-eng1` joined the pre-CTS class where it belongs, and **no
+> document in the three corpora fails at the XML layer any more**. All 236 remaining failures are
+> about citation, not markup.
 >
 > Re-running the whole corpus: **3,503 files, 3,267 parsed, 236 failed** — the same counts as before
 > the change, the same 1,036,211 units, and byte-identical coverage and invariants on every file that
@@ -197,10 +202,10 @@ This is the only unambiguous correctness defect the run found, and no exception 
 > well-formedness, which is how the masked malformed file surfaced. And a CTS-conformant document that
 > merely uses `&mdash;` — which exists outside this corpus — now reads.
 >
-> The 27th is a different animal. `stoa0058.stoa025.perseus-eng1` fails on `&Perseus.publish;`, a
-> boilerplate _markup_ macro from Perseus's own DTD, reached through a parameter entity in the
-> document's internal subset. No character table can hold it: its replacement is elements, and
-> replacement text is never rescanned as markup. That one stays out of reach by design.
+> The 27th was a different animal: `stoa0058.stoa025.perseus-eng1` failed on `&Perseus.publish;`,
+> reached through a parameter entity in the document's own internal subset. That is what the markup
+> expansion above was written for, and it now reads — as far as the citation scheme, where it fails
+> with the other 222.
 >
 > The description below is of the limitation as found.
 

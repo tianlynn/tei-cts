@@ -153,16 +153,24 @@ first such name as malformed and rejects the file whole.
 
 So the names are compiled into the package and handed to the parser before it reads anything. No
 network, no file access, one property lookup per entity. The table is **48 names, measured** — every
-entity that appears as live text anywhere in canonical-greekLit, canonical-latinLit and First1KGreek,
-and nothing else. Shipping the full HTML set instead would have cost 43 KB to define 2,072 names no
-edition writes, and would have got `&cdot;` wrong: HTML reads it as `ċ`, while the corpus uses it as
-the decimal point of a printed table, `87&cdot;9705`.
+entity appearing as live text anywhere in canonical-greekLit, canonical-latinLit and First1KGreek, and
+nothing else. Every value is checked against the DTDs the documents themselves point at, from
+`PersProse.dtd` down to the OASIS `iso-*.ent` sets: all 48 are declared there and all 48 values match.
+Shipping the full HTML set instead would have cost 43 KB to define 2,072 names no edition writes.
 
-Do not expect this to rescue old Perseus files. Of the 3,503 corpus texts, 27 failed on an entity, and
-resolving them recovers **none** of them: 26 are TEI P4 documents that predate CTS citation, so they
-now fail for that reason instead — accurately, rather than by blaming well-formedness. The table earns
-its place on CTS-conformant documents that merely use `&mdash;`. See
+A few Perseus entities are markup rather than characters — `&Perseus.publish;` is the publication
+statement every Tufts edition shares, written once in the DTD. An entity resolved to text can never
+become an element, so those are expanded into the document before it is parsed. Between the two,
+**no document in the three corpora now fails at the XML layer.**
+
+Do not expect this to rescue old Perseus files. 27 texts failed on an entity, and resolving them
+recovers **none**: they are TEI P4 documents that predate CTS citation, so they now fail for that
+reason instead — accurately, rather than by blaming well-formedness. See
 [`docs/corpus-testing.md`](docs/corpus-testing.md).
+
+One oddity worth knowing. `&cdot;` is `ċ`, which is what `iso-lat2.ent` declares — but Pliny's
+astronomical tables write `87&cdot;9705`, meaning a decimal point. The declaration is the authority
+here, as it is for citations; pass `entities: { cdot: '·' }` if you would rather read the intent.
 
 Names outside the table are rejected, loudly — including the older convention that spells Greek
 letters `&agr;`, `&bgr;`. Supply those yourself, or turn the table off for strict XML:

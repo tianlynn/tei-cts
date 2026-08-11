@@ -1,5 +1,5 @@
 import { SaxesParser } from 'saxes';
-import { corpusEntities, xmlEntityNames } from './entities.js';
+import { corpusEntities, markupEntities, xmlEntityNames } from './entities.js';
 
 /**
  * A minimal element tree, shaped for the traversal that consumes it.
@@ -99,6 +99,41 @@ function defineEntities(parser: SaxesParser, options: EntityOptions): void {
   }
 }
 
+/** Comments and CDATA, where an entity reference is not a reference. */
+const UNPARSED = /<!--[\s\S]*?-->|<!\[CDATA\[[\s\S]*?\]\]>/g;
+
+/**
+ * Expand entities whose replacement is markup, before the parser sees them.
+ *
+ * The parser has no way to do this: it resolves an entity to text, and text is
+ * where the expansion has to stop or a document could rewrite its own structure.
+ * But `&Perseus.publish;` *is* an element in the DTD that declares it, and a
+ * document referencing it is unreadable until something puts that element back.
+ * A string substitution before parsing is the honest way to do that — the result
+ * is then parsed as ordinary markup, and a malformed replacement fails as
+ * malformed XML rather than corrupting the tree.
+ *
+ * Comments and CDATA are stepped over: a reference inside them is not one, and
+ * 27 files in the corpus mention `&Perseus.OCR;` in a comment.
+ */
+function expandMarkupEntities(xml: string, entities: Record<string, string>): string {
+  const names = Object.keys(entities);
+  if (names.length === 0 || !names.some((name) => xml.includes(`&${name};`))) return xml;
+
+  const reference = new RegExp(`&(${names.map((name) => name.replace(/[.]/g, '\\.')).join('|')});`, 'g');
+  const expand = (text: string): string =>
+    text.replace(reference, (match, name: string) => entities[name] ?? match);
+
+  let out = '';
+  let at = 0;
+  UNPARSED.lastIndex = 0;
+  for (let skip = UNPARSED.exec(xml); skip !== null; skip = UNPARSED.exec(xml)) {
+    out += expand(xml.slice(at, skip.index)) + skip[0];
+    at = skip.index + skip[0].length;
+  }
+  return out + expand(xml.slice(at));
+}
+
 /**
  * Parse XML into a `TeiElement` tree.
  *
@@ -109,6 +144,7 @@ function defineEntities(parser: SaxesParser, options: EntityOptions): void {
 export function parseXml(xml: string, options: EntityOptions = {}): TeiElement {
   const parser = new SaxesParser({ xmlns: true, position: true });
   defineEntities(parser, options);
+  const source = options.corpusEntities === false ? xml : expandMarkupEntities(xml, markupEntities);
   let root: TeiElement | null = null;
   let current: TeiElement | null = null;
   let failure: Error | null = null;
@@ -156,7 +192,7 @@ export function parseXml(xml: string, options: EntityOptions = {}): TeiElement {
   });
 
   try {
-    parser.write(xml).close();
+    parser.write(source).close();
   } catch (error) {
     /* v8 ignore next -- saxes reports through the error handler; this is belt and braces */
     failure ??= error instanceof Error ? error : new Error(String(error));

@@ -106,8 +106,11 @@ export type ParseOptions = {
    *
    * Editions that use them declare them in an external DTD, which nothing here
    * fetches, so without the shipped table one `&aelig;` rejects a whole file as
-   * malformed. Set `false` for strict XML: only `amp`, `lt`, `gt`, `quot` and
-   * `apos`, plus whatever `entities` adds.
+   * malformed. Also expands the handful of Perseus entities whose replacement is
+   * markup rather than characters, such as `&Perseus.publish;`.
+   *
+   * Set `false` for strict XML: only `amp`, `lt`, `gt`, `quot` and `apos`, plus
+   * whatever `entities` adds, and no markup expansion.
    */
   corpusEntities?: boolean;
   /**

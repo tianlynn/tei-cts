@@ -11,8 +11,12 @@
  * This is a **measured** table, not the 2,120-name HTML set. Every name below
  * appears as live character data somewhere in canonical-greekLit,
  * canonical-latinLit or First1KGreek; the trailing number is how often. Shipping
- * the whole HTML set cost 43 KB to define 2,072 names no edition writes — and
- * got one of the 48 wrong (see cdot).
+ * the whole HTML set cost 43 KB to define 2,072 names no edition writes.
+ *
+ * Every value has since been checked against the DTDs the documents themselves
+ * point at — PersProse.dtd through PersTeiCommon.dtd to the OASIS iso-*.ent
+ * files, 612 declarations in all. All 48 names are declared there and all 48
+ * values match. This table is what the editions say they mean, not a guess.
  *
  * Names outside this table still fail loudly, which is the right default: the
  * alternative is emitting the literal text `&aelig;` where the letter belongs.
@@ -22,11 +26,11 @@
  *
  *   1. Scan every .xml except __cts__.xml for /&([A-Za-z_][\w.:-]*);/, minus the
  *      five XML names, and drop matches inside comments and the internal DTD
- *      subset — that is what separates live text from the three Perseus markup
- *      macros (&Perseus.OCR;, &Perseus.publish;, &prose.eng.encode;), which are
- *      elements rather than characters and cannot live in a table like this.
- *   2. Take each value from https://github.com/wooorm/character-entities (MIT),
- *      then re-read the overrides below.
+ *      subset — that is what separates live text from the Perseus markup macros
+ *      below.
+ *   2. Read each value out of the DTD chain rooted at
+ *      http://www.perseus.tufts.edu/DTD/1.0/PersProse.dtd, following the
+ *      parameter entities that pull in the OASIS character sets.
  *
  * The five XML names are deliberately absent: they live on the prototype of the
  * parser's entity map, and an own property of the same name would shadow them.
@@ -35,9 +39,13 @@
 /**
  * Entity name, without `&` and `;`, to the text it stands for.
  *
- * `cdot` departs from HTML, which reads it as `ċ` (U+010B). In this corpus it
- * is the decimal point of a British printed table — `87&cdot;9705` — so it is
- * U+00B7 MIDDLE DOT. Twenty occurrences, all in one astronomical translation.
+ * One name is worth knowing about. `cdot` is `ċ` — that is what iso-lat2.ent
+ * declares and what this table therefore says. But `phi0978.phi001.perseus-eng1`
+ * writes `87&cdot;9705` in Pliny's astronomical tables, where the printed source
+ * has a British decimal point, so that edition means `·` and its own DTD does
+ * not agree. The declaration is the authority here, as it is for citations: the
+ * text comes out as the edition declared it, and a caller who would rather read
+ * the intent passes `entities: { cdot: '·' }`.
  */
 export const corpusEntities: Readonly<Record<string, string>> = Object.freeze({
   aelig: 'æ', // 7,676
@@ -65,7 +73,7 @@ export const corpusEntities: Readonly<Record<string, string>> = Object.freeze({
   pound: '£', // 24
   rsquo: '’', // 24
   auml: 'ä', // 21
-  cdot: '·', // 20
+  cdot: 'ċ', // 20
   ocirc: 'ô', // 17
   ccedil: 'ç', // 15
   icirc: 'î', // 13
@@ -88,6 +96,30 @@ export const corpusEntities: Readonly<Record<string, string>> = Object.freeze({
   emacr: 'ē', // 1
   Euml: 'Ë', // 1
   Aacute: 'Á', // 1
+});
+
+/**
+ * Entities whose replacement is markup rather than characters.
+ *
+ * Perseus's DTD carries boilerplate as entities — `&Perseus.publish;` is the
+ * publication statement every Tufts edition shares, written once and referenced
+ * from each file. They cannot go in the table above, because replacement text
+ * there is inserted as text: `<publicationStmt>` would arrive as eighteen
+ * literal characters rather than an element. So these are expanded into the
+ * document before it is parsed, which is the one place markup can still become
+ * markup.
+ *
+ * Values are the declarations themselves, read from PersTeiHead.dtd. Whitespace
+ * is normalised; nothing else is touched.
+ */
+export const markupEntities: Readonly<Record<string, string>> = Object.freeze({
+  'Perseus.publish':
+    '<publicationStmt>' +
+    '<publisher>Trustees of Tufts University</publisher>' +
+    '<pubPlace>Medford, MA</pubPlace>' +
+    '<authority>Perseus Project</authority>' +
+    '</publicationStmt>',
+  'Perseus.OCR': '<p>optical character recognition</p>',
 });
 
 /** The five names XML defines itself. Callers may not redefine them. */

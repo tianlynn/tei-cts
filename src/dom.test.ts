@@ -84,11 +84,14 @@ describe('entities', () => {
     expect(findElement(root, 'l')!.children).toEqual([{ type: 'text', value: 'a & b < c' }]);
   });
 
-  it('reads cdot as the decimal point the corpus uses it for, not HTML’s ċ', () => {
-    // 87·9705 in an astronomical table. HTML says U+010B; the edition means U+00B7.
+  it('reads cdot as its DTD declares it, even where the edition meant otherwise', () => {
+    // iso-lat2.ent says ċ. Pliny writes 87&cdot;9705 for a decimal point and so
+    // means ·, but the declaration is the authority; overriding it is one option.
     const root = parseXml(wrap('<l>87&cdot;9705</l>'));
+    const intended = parseXml(wrap('<l>87&cdot;9705</l>'), { entities: { cdot: '·' } });
 
-    expect(findElement(root, 'l')!.children).toEqual([{ type: 'text', value: '87·9705' }]);
+    expect(findElement(root, 'l')!.children).toEqual([{ type: 'text', value: '87ċ9705' }]);
+    expect(findElement(intended, 'l')!.children).toEqual([{ type: 'text', value: '87·9705' }]);
   });
 
   it('rejects a name no table defines, rather than passing it through', () => {
@@ -116,6 +119,36 @@ describe('entities', () => {
     expect(() => parseXml(wrap('<l>&amp;</l>'), { entities: { amp: '!' } })).toThrow(
       /&amp; is defined by XML itself/,
     );
+  });
+
+  it('expands a markup macro into the element its DTD declares', () => {
+    const root = parseXml(
+      `<TEI xmlns="${TEI_NS}"><teiHeader>&Perseus.publish;</teiHeader><text><body/></text></TEI>`,
+    );
+    const statement = findElement(root, 'publicationStmt')!;
+
+    expect(elementChildren(statement).map((child) => child.name)).toEqual([
+      'publisher',
+      'pubPlace',
+      'authority',
+    ]);
+    expect(findElement(statement, 'authority')!.children).toEqual([
+      { type: 'text', value: 'Perseus Project' },
+    ]);
+  });
+
+  it('leaves a markup macro alone inside a comment', () => {
+    // 27 corpus files mention &Perseus.OCR; in a comment and nowhere else.
+    const root = parseXml(wrap('<!-- &Perseus.OCR; --><l>text</l>'));
+    const body = findElement(root, 'body')!;
+
+    expect(elementChildren(body).map((element) => element.name)).toEqual(['l']);
+  });
+
+  it('does not expand markup macros with the table turned off', () => {
+    const xml = `<TEI xmlns="${TEI_NS}"><teiHeader>&Perseus.publish;</teiHeader></TEI>`;
+
+    expect(() => parseXml(xml, { corpusEntities: false })).toThrow(/undefined entity/);
   });
 
   it('does not rescan replacement text for markup or further entities', () => {
