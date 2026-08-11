@@ -34,25 +34,32 @@ they exercise the element policy harder than the Greek and Latin do.
 
 ### The harness
 
-Three scripts, committed at [`tools/corpus/`](../tools/corpus/). They were throwaway when this run was
+Four scripts, committed at [`tools/corpus/`](../tools/corpus/). They were throwaway when this run was
 made; keeping them was the point of the run being repeatable:
 
-- **fetch** — download and extract the three tarballs, keeping only `data/`. Idempotent.
+- **fetch** — download and extract the three tarballs, keeping only `data/`. Idempotent. Resolves each
+  branch to a commit before downloading and records it beside the extracted tree, since a branch name
+  is not a version and a result nobody can trace to a commit is not reproducible.
 - **run** — walk the corpus, parse each file, append one JSON record per file to a JSONL. It imports
   the built `dist/`, not `src/`, so it exercises what a consumer installs. Records are written one
   line at a time with a synchronous write, so a process death (out-of-memory on a large document
   being the plausible cause) preserves everything before it and identifies the file that caused it.
   A re-run skips paths already recorded.
-- **report** — reduce the JSONL to a findings report.
+- **report** — reduce the JSONL to a findings report, for a human to read.
+- **manifest** — reduce the same JSONL to `manifest.json`: the texts that parsed reliably enough to
+  hand downstream, keyed by URN, with every text it leaves out carrying the exception or the
+  measurement that disqualified it. For a program to read. Added after this run; see
+  [The manifest](#the-manifest).
 
-Each record carries the outcome, timing, resident memory, the resolved citation scheme, unit count,
-empty-unit count, per-document invariant results, coverage, and the element names the default policy
-does not mention.
+Each record carries the outcome, timing, resident memory, header metadata, the resolved citation
+scheme, unit count, empty-unit count, per-document invariant results, coverage, unexplained loss,
+citation resolution, and the element names the default policy does not mention.
 
 ### The metrics, and why
 
 Exceptions are the easy half. A parser can also return a well-formed, plausible-looking result that
-is quietly missing most of the text, and nothing throws. Four measurements target that:
+is quietly missing most of the text, and nothing throws. Five measurements target that — and they are
+not all about text, because a result can be complete and still be unusable:
 
 **Coverage** — characters of unit text over non-whitespace character data inside `<body>`. It is
 always below 1, because the policy drops apparatus by design, so the absolute number means little.
@@ -61,7 +68,19 @@ The distribution is the signal.
 **Unexplained loss** — `1 − coverage − (characters inside dropped elements ÷ body characters)`. This
 is the metric that actually works. Coverage alone cannot separate "correctly dropped 88% because this
 edition is mostly commentary" from "silently lost 65% through a traversal bug"; subtracting the
-policy's own share does.
+policy's own share does. It is recorded per document as `unexplainedLoss`, and **81% of the corpus
+scores exactly 0** with a 90th percentile of 0.002 — so unlike a coverage percentile, its tail is
+anomalous rather than merely low. It reads 0 for all twelve fixtures, including the ragged-hierarchy
+one whose coverage of 0.7473 is entirely accounted for by policy drops.
+
+**Citation resolution** — units ÷ the divisions the body numbers with `@n`, recorded as `resolution`.
+The one measurement here that is not about characters, and the reason it exists is that all the others
+are. A scheme can retain every character and still emit a fraction of the units the edition is
+numbered for, and no character count can see it: `tlg4102.tlg038` yields **25 units against 3,899
+numbered divisions at 0.9971 coverage**. Corpus-wide, **138 texts emit under 5% of their numbered
+divisions, 67 of them at coverage above 0.9**. Its denominator over-counts — `<pb n="12">` and
+`<milestone>` carry `@n` and are not citable — so only the far low tail signals; the Republic fixture
+legitimately reads 0.14.
 
 **Scheme source** — the share of documents falling back to `inferred`. These corpora are largely
 CTS-conformant, so a high inferred rate would indicate the `refsDecl` reader is too strict rather
@@ -352,17 +371,73 @@ What the remaining difference is, and is not:
   `div[@type='textpart'][@subtype='paragraph']` while its body now holds `div[@type='paragraph']`.
   The declaration and the document have been normalised to different conventions.
 
-None of the last three is this parser's to fix, and none should be quietly worked around: they are
+- **2,560 files lose their CTS URN**, found later, when the manifest step made the identifier
+  load-bearing. The released encoding puts it on the edition div — `<div type="edition"
+n="urn:cts:greekLit:ggm0001.ggm001.1st1K-grc1">` — and the normalised encoding has no edition div at
+  all, moving the URN to `xml:base` on `<body>`. Only 17 of 3,183 normalised documents that parse still
+  declare one where this parser reads it. Nothing is lost from the _text_, and the URN is still in the
+  file; it is a third place the migration has moved something, and the most consequential one for a
+  consumer, because a list keyed by URN cannot include a document that does not declare one.
+
+None of the last four is this parser's to fix, and none should be quietly worked around: they are
 upstream work in progress, and the value of running the branch is being able to say precisely which
 file disagrees with itself and where.
 
 **Verdict: the normalised corpus improves nothing today, and that is the finding.** It parses 84
-fewer files than the released one, cites 213 works at a coarser depth, and loses text in 23. Nobody
-should switch to it, and `citeStructure` is off by default for that reason and not only for
-compatibility. What the work buys is readiness and a measurement: when a normalised edition does
+fewer files than the released one, cites 213 works at a coarser depth, loses text in 23, and strips
+the identifier from 2,560. Nobody should switch to it, and `citeStructure` is off by default for that
+reason and not only for compatibility. What the work buys is readiness and a measurement: when a normalised edition does
 arrive, one option reads it, and the harness can already say — file by file — whether the migration
 has improved or damaged the corpus. Re-run it when the branches move. **Parsing work stops here**;
 the remaining differences belong to Perseus, not to this parser.
+
+## The manifest
+
+Everything above asks how the parser is doing. A consumer asks something narrower: **which of these
+3,503 files can I pick up and rely on?** `manifest.mjs` answers that from the same JSONL, and writes
+`.corpus/manifest.json` — machine-readable and nothing else, since the prose lives here.
+
+At `790c842` / `4620cf8` / `bfea9ac`, parsed by 0.2.0:
+
+| Corpus       | Files | Listed |  high | review | Excluded | Units     |
+| ------------ | ----: | -----: | ----: | -----: | -------: | --------- |
+| `released`   | 3,503 |  3,166 | 2,124 |  1,042 |      337 | 1,023,030 |
+| `normalized` | 3,503 |    589 |   372 |    217 |    2,914 | 351,081   |
+
+The released corpus is the one to build from, for the reasons in finding 8; the normalised column is
+there to track the migration, and the 2,914 exclusions are 2,589 documents with no URN, 320 that do
+not parse, and 5 below the coverage floor.
+
+**Blocking checks** — fail one and the text is not listed, because it cannot be used: it parsed
+without throwing, declares a URN, produced at least one citable unit, gives no citation to two
+different units, has NFC and trimmed text, and got at least half its body's characters into units.
+On the released corpus that excludes 337: 236 that throw (223 of them the out-of-scope `refState`
+documents of finding 3), 75 under the coverage floor, and 26 with no URN.
+
+**Advisory checks** — fail one and the text is listed at `confidence: "review"` with the warning
+attached: coverage under 90% (839), coarse citation (134), a single-unit work (92), an inferred scheme
+(84), unexplained loss over 0.05 (60), or over 5% of units empty (9). These qualify a text rather than
+reject it because each has a legitimate cause about as often as a suspicious one, which is the same
+reason coverage is described above as a heuristic for locating suspicion. **2,124 texts trip none of
+them.**
+
+The two smallest counts are the two that matter. `unexplained-loss` flags 60 where `low-coverage`
+flags 839, and it is the sharper instrument for the reason given under the metrics above. And
+**52 texts are flagged by `coarse-citation` and by nothing else** — every one of them `high`
+confidence before the check existed, every one of them keeping its characters while citing at a
+fraction of the granularity its body is numbered for. That is a failure mode the four original
+advisory checks could not express, which is the argument for measuring resolution separately from
+retention rather than folding both into one quality score.
+
+Two of the invariants deliberately are **not** checks. `noMarkup` is finding 5's false alarm and is
+ignored; `pathLen` is ragged citation, which is correct behaviour, and is reported per text as a
+`ragged` flag instead — a consumer needs to know that `unit.path` may be shorter than
+`citation.levels` in that text, which is information rather than a defect.
+
+The thresholds are constants in the script, not command-line options: two runs have to be comparable,
+and a tunable bar is not a bar. They are copied into every manifest under `criteria`, along with the
+parser version, the parse options, and the commit of each corpus repository, so a consumer can read
+what a run vouched for, and from exactly which corpus, without the script.
 
 ## Limitations
 
@@ -401,6 +476,11 @@ Added after finding 8, and **applied**:
 7. **Read `citeStructure`, behind an option that defaults to off** (finding 8). Applied, with a second
    corpus and a fixture. It recovers no coverage — see the verdict on that finding — and was done for
    readiness rather than for a number.
+8. **Turn the run into a list downstream can consume** — applied, as `manifest.mjs`; see
+   [The manifest](#the-manifest). Everything above locates work for whoever maintains the parser,
+   which is not what a consumer needs from the same data. Making the URN load-bearing is also what
+   surfaced the fourth normalisation difference in finding 8, so the artifact paid for itself before
+   it was used.
 
 ### TODO: report the malformed files upstream
 
@@ -428,14 +508,17 @@ own message is close to a usable bug report as it stands.
 npm run corpus
 ```
 
-That builds the package, downloads the three corpora, parses all 3,503 texts and writes the report —
-about four minutes the first time, half a minute per run after, since the download is the slow part
-and is skipped once it is on disk. Everything it touches lives in `.corpus/`, which is git-ignored, so
-a fresh clone can do this without producing a tracked change and `rm -rf .corpus` undoes it.
-[`tools/corpus/README.md`](../tools/corpus/README.md) documents the individual steps, the self-test
-against the committed fixtures, and the environment overrides.
+That builds the package, downloads the three corpora, parses all 3,503 texts, and writes both the
+report and the manifest — about four minutes the first time, half a minute per run after, since the
+download is the slow part and is skipped once it is on disk. `npm run corpus:normalized` does the same
+for the working branches. Every step takes `--corpus=<name>`, and a step whose input is missing says
+which command produces it rather than failing with a stack trace. Everything it touches lives in
+`.corpus/`, which is git-ignored, so a fresh clone can do this without producing a tracked change and
+`rm -rf .corpus` undoes it. [`tools/corpus/README.md`](../tools/corpus/README.md) documents the
+individual steps, the self-test against the committed fixtures, and the environment overrides.
 
 What matters more than the scripts is the shape: parse everything, record one JSON line per file, and
-reduce that to error signatures, a scheme census, an unknown-element census, and outliers ranked by
-unexplained loss. It is cheap enough to repeat after any change to the citation logic or the element
-policy — which is how the entity table of finding 2 was shown to recover nothing.
+reduce that twice — once to error signatures, a scheme census, an unknown-element census and outliers
+ranked by unexplained loss, for whoever maintains the parser; once to a list of what can be relied on,
+for whoever consumes it. It is cheap enough to repeat after any change to the citation logic or the
+element policy — which is how the entity table of finding 2 was shown to recover nothing.

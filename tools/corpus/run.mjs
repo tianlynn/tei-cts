@@ -13,24 +13,31 @@
  * each record also carries coverage, per-document invariants, and the elements
  * the default policy has no opinion about.
  *
- *   node tools/corpus/run.mjs                        # released corpus, options as shipped
- *   CORPUS=normalized node tools/corpus/run.mjs      # working branches, citeStructure on
- *   CORPUS_ROOT=fixtures node tools/corpus/run.mjs   # self-test, see README
+ * Two of the measurements are the ones that discriminate, and they sit on
+ * different axes. `unexplainedLoss` is coverage with the policy's own deliberate
+ * deletions subtracted, so it separates "correctly dropped a third of this
+ * commentary" from "silently lost a third to a bug"; 81% of the corpus scores
+ * exactly zero. `resolution` is units over the divisions the body numbers, and
+ * it catches what no character count can — a scheme that keeps every character
+ * while emitting a fraction of the units the edition is numbered for.
+ *
+ *   node tools/corpus/run.mjs                          # released corpus, options as shipped
+ *   node tools/corpus/run.mjs --corpus=normalized      # working branches, citeStructure on
+ *   CORPUS_ROOT=fixtures node tools/corpus/run.mjs     # self-test, see README
  */
 import { closeSync, existsSync, openSync, readFileSync, statSync, writeSync } from 'node:fs';
 import { relative } from 'node:path';
-import { corpus, DIST, texts } from './paths.mjs';
-
-const { defaultElementPolicy, parseTeiDocument } = await import(DIST).catch(() => {
-  throw new Error(`${DIST} is missing — run \`npm run build\` first`);
-});
+import { corpus, DIST, fail, requireTexts } from './paths.mjs';
 
 const CORPUS = corpus();
 const ROOT = CORPUS.dir;
 const RESULTS = CORPUS.results;
-if (!existsSync(ROOT)) {
-  throw new Error(`${ROOT} is missing — run \`CORPUS=${CORPUS.name} npm run corpus:fetch\` first`);
-}
+
+const files = requireTexts(CORPUS);
+
+const { defaultElementPolicy, parseTeiDocument } = await import(DIST).catch(() =>
+  fail(`${DIST} is missing — the package has not been built.`, '', 'Build it:', '', '  npm run build'),
+);
 
 // Every record says which corpus and which options produced it, so two runs
 // cannot be compared without noticing that they were parsed differently.
@@ -40,29 +47,83 @@ process.stderr.write(`${CORPUS.name}: parsing ${ROOT} with ${JSON.stringify(OPTI
 /** Elements the policy names, plus the ones it handles structurally. */
 const KNOWN = new Set([...Object.keys(defaultElementPolicy), 'choice', 'app', 'subst', 'body']);
 
-/** Non-whitespace character data inside <body>, markup and comments removed. */
-function bodyTextLength(xml) {
+/** The names the policy discards, which is why coverage is legitimately below 1. */
+const DROPPED = Object.entries(defaultElementPolicy)
+  .filter(([, action]) => action === 'drop')
+  .map(([name]) => name);
+
+/**
+ * `<body>`, comments removed. Everything below measures the source this way —
+ * by regular expression over raw XML rather than by walking the parse — so that
+ * the measurements stay independent of the thing being measured. A traversal
+ * bug that loses text would otherwise lose it from both sides of the ratio.
+ */
+function bodyOf(xml) {
   const start = xml.indexOf('<body');
-  if (start === -1) return 0;
+  if (start === -1) return null;
   const end = xml.lastIndexOf('</body>');
-  const body = xml.slice(start, end === -1 ? undefined : end);
-  return body
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<[^>]*>/g, '')
-    .replace(/\s+/g, '').length;
+  return xml.slice(start, end === -1 ? undefined : end).replace(/<!--[\s\S]*?-->/g, '');
 }
+
+/** Non-whitespace character data, markup removed. */
+const plainLength = (fragment) => fragment.replace(/<[^>]*>/g, '').replace(/\s+/gu, '').length;
 
 /** Element local names appearing inside <body>. */
 function bodyElements(xml) {
-  const start = xml.indexOf('<body');
-  if (start === -1) return [];
-  const body = xml.slice(start).replace(/<!--[\s\S]*?-->/g, '');
+  const body = bodyOf(xml);
+  if (body === null) return [];
   const names = new Set();
   for (const match of body.matchAll(/<([A-Za-z_][\w.:-]*)/g)) {
     names.add((match[1] ?? '').replace(/^[^:]*:/, ''));
   }
   return [...names];
 }
+
+/**
+ * The share of body characters the policy is *supposed* to discard.
+ *
+ * Measured as a set difference — prune every dropped subtree, then compare —
+ * rather than by summing each element's text, because summing double-counts a
+ * `<note>` inside a `<head>` and would explain away loss that never happened.
+ *
+ * Imprecise in one known direction: with a non-greedy match, `<note>a<note>b
+ * </note>c</note>` leaves `c` behind, so nesting of the same name under-reports
+ * what was dropped. That inflates unexplained loss rather than hiding it, which
+ * is the safe way for a suspicion-locating metric to be wrong.
+ */
+function droppedShare(body, total) {
+  if (total === 0) return null;
+  let pruned = body;
+  for (const name of DROPPED) {
+    const element = `(?:[\\w.-]+:)?${name}`;
+    // Skip names with no closing tag in this document, which is both an
+    // optimisation and the fix for a quadratic blowup. Half these names are
+    // milestones written `<lb/>`, and for every one of them the non-greedy match
+    // below would scan to the end of the document hunting a `</lb>` that does
+    // not exist. On a 17 MB document with thousands of them that dominated the
+    // whole corpus run — 3 minutes against 25 seconds. Nothing is lost by
+    // skipping them: an empty element encloses no characters to drop.
+    if (!new RegExp(`</${element}>`).test(pruned)) continue;
+    const pattern = new RegExp(`<${element}(?:\\s[^>]*)?>[\\s\\S]*?</${element}>`, 'g');
+    for (let previous = null; previous !== pruned;) {
+      previous = pruned;
+      pruned = pruned.replace(pattern, '');
+    }
+  }
+  return Number(((total - plainLength(pruned)) / total).toFixed(4));
+}
+
+/**
+ * How many divisions the edition numbers, against which unit count is read.
+ *
+ * `@n` is how CTS numbers anything citable, so this counts the document's own
+ * claim about how finely it can be addressed. It over-counts — `<pb n="12">` and
+ * `<milestone>` carry `@n` and are not citable — so the ratio's absolute value
+ * means nothing, exactly as coverage's does not. Only the far low tail is a
+ * signal, and there it is one coverage cannot give: a scheme that keeps every
+ * character while emitting a fraction of the units the body is numbered for.
+ */
+const numberedDivisions = (body) => (body.match(/<[A-Za-z][\w.:-]*\s[^>]*\bn=/g) ?? []).length;
 
 /** Collapse a message into a signature, so thousands of failures group into causes. */
 const signature = (message) =>
@@ -85,7 +146,6 @@ if (existsSync(RESULTS)) {
   process.stderr.write(`resuming, ${done.size} already recorded\n`);
 }
 
-const files = texts(ROOT);
 const fd = openSync(RESULTS, 'a');
 let peakRss = 0;
 let count = 0;
@@ -116,6 +176,13 @@ for (const file of files) {
     record.ok = true;
     record.urn = doc.urn;
     record.language = doc.language;
+    // Header metadata is carried through so the manifest can be built from the
+    // JSONL alone, without re-reading 898 MB of XML to answer "what is this?".
+    record.title = doc.title;
+    record.author = doc.author;
+    record.editor = doc.editor;
+    record.edition = doc.edition;
+    record.license = doc.license;
     record.scheme = {
       source: doc.citation.source,
       levels: doc.citation.levels.map((level) => level.label),
@@ -143,9 +210,23 @@ for (const file of files) {
       seen.add(unit.citation);
     }
 
-    const bodyChars = bodyTextLength(xml);
+    const body = bodyOf(xml);
+    const bodyChars = body === null ? 0 : plainLength(body);
     record.emptyUnits = empty;
     record.coverage = bodyChars === 0 ? null : Number((textChars / bodyChars).toFixed(4));
+
+    // Two signals coverage cannot give on its own, measured on separate axes:
+    // did the characters survive, and did the scheme carve the document as
+    // finely as the document says it can be carved. A text can pass either one
+    // while failing the other, which is the whole reason both are here.
+    record.droppedShare = body === null ? null : droppedShare(body, bodyChars);
+    record.unexplainedLoss =
+      record.coverage === null || record.droppedShare === null
+        ? null
+        : Number((1 - record.coverage - record.droppedShare).toFixed(4));
+    record.numbered = body === null ? 0 : numberedDivisions(body);
+    record.resolution =
+      record.numbered === 0 ? null : Number((doc.units.length / record.numbered).toFixed(4));
     // pathLen and noMarkup are expected to fail on real data: ragged editions
     // cite above the deepest level, and <> is editorial notation. See the
     // findings document before treating either as a defect.

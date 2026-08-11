@@ -251,6 +251,16 @@ It downloads the corpora and writes its output to `.corpus/`, which is git-ignor
 undoes it. See [`tools/corpus/README.md`](tools/corpus/README.md), and
 [`docs/corpus-testing.md`](docs/corpus-testing.md) for what a full run found.
 
+Besides the findings report, a run writes **`.corpus/manifest.json`** — the 3,166 released texts that
+parse reliably, keyed by URN, with metadata, citation scheme and quality measurements for each, and
+every excluded text carrying the exception or measurement that disqualified it. Quality is measured on
+two axes rather than one: `unexplainedLoss` (coverage with the policy's own deliberate deletions
+subtracted, so 0 means nothing went missing unaccounted for) and `resolution` (units over the
+divisions the body numbers, which catches a scheme that keeps every character while citing far more
+coarsely than the edition allows). It names the commit of each corpus
+repository it was generated from, so a downstream consumer can say exactly which corpus a list came
+from. That is the file to pick up; build it alone with `npm run corpus:manifest`.
+
 The test corpus is seven real Perseus excerpts covering every citation shape above, plus invariants
 asserted across all of them — citations unique and one value per level, no markup reaching the text,
 NFC stability, elision preserved, and citations provably independent of the element policy. Fixtures

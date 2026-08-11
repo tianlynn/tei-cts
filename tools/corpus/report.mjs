@@ -5,15 +5,12 @@
  * things worth reading a file about. Counts alone say nothing about quality —
  * they say where to look.
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { corpus } from './paths.mjs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { corpus, requireResults } from './paths.mjs';
 
 const CORPUS = corpus();
-const { report: REPORT, results: RESULTS } = CORPUS;
-
-if (!existsSync(RESULTS)) {
-  throw new Error(`${RESULTS} is missing — run \`CORPUS=${CORPUS.name} npm run corpus:run\` first`);
-}
+const { report: REPORT } = CORPUS;
+const RESULTS = requireResults(CORPUS);
 
 const records = readFileSync(RESULTS, 'utf8')
   .split('\n')

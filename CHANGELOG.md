@@ -51,6 +51,25 @@ All notable changes to this project are documented here. The format follows
   reversed one earlier decision: `&cdot;` ships as `ċ`, its declared value, not the `·` that Pliny's
   astronomical tables evidently intend — the declaration is the authority, and
   `entities: { cdot: '·' }` is the override.
+- **A corpus manifest of the texts that parse reliably**, at `.corpus/manifest.json` via
+  `npm run corpus:manifest` — development tooling, not shipped in the package. **3,166 of the 3,503
+  released texts**, keyed by URN, with metadata, citation scheme, quality measurements and confidence
+  for each; 2,124 trip no advisory check at all. The 337 it leaves out carry the exception or the measurement
+  that disqualified them, so every file in the corpus is accounted for in the same document. Each
+  manifest names the parser version, the parse options, and the **commit** of each corpus repository
+  it was generated from — `fetch.mjs` now resolves a branch to a commit before downloading, since a
+  branch name is not a version. Building this is what surfaced the fourth normalisation difference in
+  finding 8: the normalised branches move the CTS URN off the edition div, leaving **2,560 texts with
+  no identifier** a downstream list could key on. See [`docs/corpus-testing.md`](docs/corpus-testing.md).
+- **Two quality signals in the corpus harness**, on the two axes a parse can fail independently.
+  **`unexplainedLoss`** is `1 − coverage − droppedShare`, restoring the metric the findings document
+  already called "the one that actually works" — it separates a commentary that was _supposed_ to lose
+  a third of its body from one that lost it to a bug. **81% of the corpus scores exactly 0**, and it
+  flags 60 texts where raw coverage flags 839. **`resolution`** is units over the divisions the body
+  numbers with `@n`, and it measures something no character count can: `tlg4102.tlg038` emits 25 units
+  against 3,899 numbered divisions at **0.9971 coverage**. **52 texts are flagged by it and by nothing
+  else**, all previously `high` confidence. Both are advisory checks in the manifest and are carried
+  raw on every listed text, so a consumer can set its own bar.
 
 ### Fixed
 
