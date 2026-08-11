@@ -310,6 +310,194 @@ describe('inferring a scheme from structure', () => {
   });
 });
 
+/**
+ * `citeStructure` is TEI's newer citation declaration, and Perseus's
+ * normalisation project is migrating to it. The option is off by default, so
+ * every test above reads the `cRefPattern` path exactly as it always did.
+ */
+describe('citeStructure', () => {
+  const cite = ({
+    refsDecl = '',
+    body = '',
+  }: {
+    refsDecl?: string;
+    body?: string;
+  }): string => `<TEI xmlns="${TEI_NS}">
+    <teiHeader><fileDesc><titleStmt><title>A Work</title></titleStmt></fileDesc>
+    <encodingDesc>${refsDecl}</encodingDesc></teiHeader>
+    <text><body xml:base="urn:cts:greekLit:tlg0000.tlg000.test">${body}</body></text>
+  </TEI>`;
+
+  const twoLevel = `<refsDecl n="CTS">
+    <citeStructure match="/TEI/text/body" use="@xml:base">
+      <citeStructure unit="book" delim=":" match="div[@type='book']" use="@n">
+        <citeStructure unit="line" delim="." match="l" use="@n"/>
+      </citeStructure>
+    </citeStructure>
+  </refsDecl>`;
+
+  const books = `<div n="1" type="book"><l n="1">alpha</l><l n="2">beta</l></div>
+                 <div n="2" type="book"><l n="1">gamma</l></div>`;
+
+  /**
+   * One book, for the cases that assert the declaration was *not* read. These
+   * documents have no edition div — that is what normalisation removes — so
+   * inference reads the outermost book as the edition. With two books that
+   * collides on line 1 and throws, which would hide what is being tested.
+   */
+  const oneBook = `<div n="1" type="book"><l n="1">alpha</l><l n="2">beta</l></div>`;
+
+  it('is ignored unless the option is on', () => {
+    const doc = parseTeiDocument(cite({ refsDecl: twoLevel, body: oneBook }));
+
+    expect(doc.citation.source).toBe('inferred');
+    expect(doc.units.map((unit) => unit.citation)).toEqual(['1', '2']);
+  });
+
+  it('reads a nested declaration into levels and citations', () => {
+    const doc = parseTeiDocument(cite({ refsDecl: twoLevel, body: books }), { citeStructure: true });
+
+    expect(doc.citation.source).toBe('citeStructure');
+    expect(doc.citation.levels).toEqual([
+      { label: 'book', element: 'div' },
+      { label: 'line', element: 'l' },
+    ]);
+    expect(doc.units.map((unit) => unit.citation)).toEqual(['1.1', '1.2', '2.1']);
+    expect(doc.units.map((unit) => unit.text)).toEqual(['alpha', 'beta', 'gamma']);
+  });
+
+  it('reports the equivalent XPath, so both declaration forms read alike', () => {
+    const doc = parseTeiDocument(cite({ refsDecl: twoLevel, body: books }), { citeStructure: true });
+
+    expect(doc.citation.pattern).toBe("#xpath(/TEI/text/body/div[@type='book'][@n='$1']/l[@n='$2'])");
+  });
+
+  it('does not make the anchoring level a citation level', () => {
+    // The outermost citeStructure uses @xml:base — the edition's URN. Counting
+    // it as a level would put that URN in front of every citation.
+    const doc = parseTeiDocument(cite({ refsDecl: twoLevel, body: books }), { citeStructure: true });
+
+    expect(doc.units[0]!.path).toEqual(['1', '1']);
+  });
+
+  it('takes the deepest of several declarations, as Thucydides declares them', () => {
+    const shallow = `<refsDecl n="CTS-book">
+      <citeStructure match="/TEI/text/body" use="@xml:base">
+        <citeStructure unit="book" match="div[@type='book']" use="@n"/>
+      </citeStructure>
+    </refsDecl>`;
+    const doc = parseTeiDocument(cite({ refsDecl: shallow + twoLevel, body: books }), {
+      citeStructure: true,
+    });
+
+    expect(doc.citation.levels.map((level) => level.label)).toEqual(['book', 'line']);
+  });
+
+  it('wins over a cRefPattern declared beside it', () => {
+    const stale = `<refsDecl n="CTS"><cRefPattern n="line" matchPattern="(\\w+).(\\w+)"
+      replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:l[@n='$2'])"/>
+    </refsDecl>`;
+    const doc = parseTeiDocument(cite({ refsDecl: stale + twoLevel, body: books }), {
+      citeStructure: true,
+    });
+
+    expect(doc.citation.source).toBe('citeStructure');
+  });
+
+  it('falls back to the cRefPattern when no citeStructure is declared', () => {
+    const doc = parseTeiDocument(readFixture('homer-odyssey.xml'), { citeStructure: true });
+
+    expect(doc.citation.source).toBe('refsDecl');
+    expect(doc.units).toHaveLength(40);
+  });
+
+  it('refuses a level whose @use is not a plain attribute', () => {
+    const unreadable = twoLevel.replace('use="@n"/>', 'use="position()"/>');
+    const doc = parseTeiDocument(cite({ refsDecl: unreadable, body: oneBook }), {
+      citeStructure: true,
+    });
+
+    expect(doc.citation.source).toBe('inferred');
+  });
+
+  it('reads the three spellings of a relative match the corpus uses', () => {
+    const spellings = ["div[@type='book']", "./div[@type='book']", ".//div[@type='book']"];
+    const cited = spellings.map((match) => {
+      const declared = twoLevel.replace('match="div[@type=\'book\']"', `match="${match}"`);
+      const doc = parseTeiDocument(cite({ refsDecl: declared, body: books }), { citeStructure: true });
+      return doc.units.map((unit) => unit.citation);
+    });
+
+    expect(cited).toEqual([
+      ['1.1', '1.2', '2.1'],
+      ['1.1', '1.2', '2.1'],
+      ['1.1', '1.2', '2.1'],
+    ]);
+  });
+
+  it('refuses a @match written with xpath it cannot read', () => {
+    const unreadable = twoLevel.replace('match="l"', 'match="l[position()=1]"');
+    const doc = parseTeiDocument(cite({ refsDecl: unreadable, body: oneBook }), {
+      citeStructure: true,
+    });
+
+    expect(doc.citation.source).toBe('inferred');
+  });
+
+  it('refuses a level anchored on a marker element', () => {
+    // The normalised Odyssey cites its cards as milestone[@unit='card'] and
+    // means the text between one marker and the next. Honouring that would give
+    // the right number of units with nothing in any of them.
+    const cards = twoLevel.replace('match="l"', `match="milestone[@unit='card']"`);
+    const doc = parseTeiDocument(cite({ refsDecl: cards, body: oneBook }), { citeStructure: true });
+
+    expect(doc.citation.source).toBe('inferred');
+  });
+
+  it('refuses alternatives at one depth rather than picking one', () => {
+    const alternatives = `<refsDecl n="CTS">
+      <citeStructure match="/TEI/text/body" use="@xml:base">
+        <citeStructure unit="book" match="div[@type='book']" use="@n">
+          <citeStructure unit="line" match="l" use="@n"/>
+          <citeStructure unit="section" match="div[@type='section']" use="@n"/>
+        </citeStructure>
+      </citeStructure>
+    </refsDecl>`;
+    const doc = parseTeiDocument(cite({ refsDecl: alternatives, body: oneBook }), {
+      citeStructure: true,
+    });
+
+    expect(doc.citation.source).toBe('inferred');
+  });
+});
+
+describe('the citeStructure fixture', () => {
+  /**
+   * A transitional document from the normalisation branch. The edition div has
+   * been removed from the body, so the cRefPattern the file still carries points
+   * through an element that is no longer there.
+   */
+  const xml = (): string => readFixture('edge-cite-structure.xml');
+
+  it('cites both books when the citeStructure is read', () => {
+    const doc = parseTeiDocument(xml(), { citeStructure: true });
+
+    expect(doc.citation.source).toBe('citeStructure');
+    expect(doc.citation.levels.map((level) => level.label)).toEqual(['book', 'line']);
+    expect(doc.units).toHaveLength(20);
+    expect(doc.units[0]!.citation).toBe('1.1');
+    expect(doc.units.at(-1)!.citation).toBe('2.10');
+    expect(doc.units[0]!.text).toBe('ἀρχόμενος σέο, Φοῖβε, παλαιγενέων κλέα φωτῶν');
+  });
+
+  it('is rejected with the option off, because the stale pattern matches nothing', () => {
+    // Not a safety net worth relying on: the fallback to inference reads each
+    // book as if it were the whole edition, and only the collision between two
+    // books' line 1 stops it. A one-book document would parse, wrongly.
+    expect(() => parseTeiDocument(xml())).toThrow(/same citation twice/u);
+  });
+});
+
 describe('document metadata', () => {
   it('reads the header of a Greek edition', () => {
     const doc = parseTeiDocument(readFixture('homer-odyssey.xml'));

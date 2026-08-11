@@ -51,6 +51,7 @@
     "corpus:fetch": "node tools/corpus/fetch.mjs",
     "corpus:run": "node tools/corpus/run.mjs",
     "corpus:report": "node tools/corpus/report.mjs",
+    "corpus:normalized": "npm run build && CORPUS=normalized node tools/corpus/fetch.mjs && CORPUS=normalized node tools/corpus/run.mjs && CORPUS=normalized node tools/corpus/report.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

@@ -41,12 +41,20 @@ Derived from `homer-odyssey.xml` by the modification named, and used to test the
 | `edge-unsupported-refs-decl.xml` | `replacementPattern` rewritten to use `position()` and `contains()`, which are outside the supported XPath subset |
 | `edge-no-body.xml`               | everything from `<text>` onward removed, leaving a header with nothing citable                                    |
 
-`edge-ragged-hierarchy.xml` is different in kind: a **complete, unmodified** work rather than a
-derived edge case.
+Two are different in kind: real editions rather than derived edge cases.
 
-| File                        | Work                         | URN                                          |
-| --------------------------- | ---------------------------- | -------------------------------------------- |
-| `edge-ragged-hierarchy.xml` | Anonymi Logica et Quadrivium | `urn:cts:greekLit:tlg1799.tlg008.1st1K-grc1` |
+| File                        | Work                            | URN                                            |
+| --------------------------- | ------------------------------- | ---------------------------------------------- |
+| `edge-ragged-hierarchy.xml` | Anonymi Logica et Quadrivium    | `urn:cts:greekLit:tlg1799.tlg008.1st1K-grc1`   |
+| `edge-cite-structure.xml`   | Apollonius Rhodius, Argonautica | `urn:cts:greekLit:tlg0001.tlg001.perseus-grc2` |
+
+`edge-cite-structure.xml` is taken from
+[`PerseusDLCode/canonical-greekLit`](https://github.com/PerseusDLCode/canonical-greekLit), branch
+`editing`, where Perseus's normalisation project is at work — not from the released branch. It is the
+opening of books 1 and 2, trimmed; its header is complete and unmodified, and carries all three
+`refsDecl` elements the transitional documents have. It is the regression guard for
+`citeStructure`: the `<div type="edition">` wrapper is gone from the body, so the `cRefPattern` the
+file still declares matches nothing, and the document is only readable through the new declaration.
 
 It declares a `section/subsection` citation scheme but numbers subsections in only 2 of its 21
 sections. It is kept as the regression guard for ragged hierarchies: before that case was handled,

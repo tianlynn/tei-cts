@@ -47,7 +47,18 @@ export function parseXPath(pattern: string): CitationStep[] {
   if (inner === undefined) {
     throw new Error(`citation pattern is not an #xpath(...) expression: "${pattern}"`);
   }
+  return scanSteps(inner, pattern);
+}
 
+/**
+ * Scan a location path into steps.
+ *
+ * Shared by both declaration forms: a `cRefPattern` holds one absolute path
+ * wrapped in `#xpath(...)`, a `citeStructure` holds one path per level in
+ * `@match`. `pattern` appears in errors and is whatever the caller was reading,
+ * so a message names the attribute the reader can go and look at.
+ */
+function scanSteps(inner: string, pattern: string): CitationStep[] {
   const steps: CitationStep[] = [];
   let at = 0;
 
@@ -126,7 +137,19 @@ const captureCount = (steps: CitationStep[]): number =>
  * to inference. A missing `refsDecl` is not an error: plenty of real editions
  * omit it, and a readable body is still worth reading.
  */
-export function schemeFromRefsDecl(root: TeiElement, separator: string): ResolvedScheme | null {
+export function schemeFromRefsDecl(
+  root: TeiElement,
+  separator: string,
+  citeStructure = false,
+): ResolvedScheme | null {
+  // A transitional document carries both forms, and only the citeStructure
+  // describes the body as it now stands — the cRefPattern beside it was written
+  // against a structure the normalisation has already changed.
+  if (citeStructure) {
+    const declared = schemeFromCiteStructure(root, separator);
+    if (declared !== null) return declared;
+  }
+
   const declarations = findElements(root, 'refsDecl');
   const preferred =
     declarations.find((declaration) => declaration.attributes['n'] === 'CTS') ??
@@ -170,6 +193,153 @@ export function schemeFromRefsDecl(root: TeiElement, separator: string): Resolve
     },
     steps: deepest.steps,
   };
+}
+
+/** `@use` this parser can execute: one attribute, which is all any edition writes. */
+const USE_ATTRIBUTE = /^@([A-Za-z_][\w.:-]*)$/u;
+
+/**
+ * A `citeStructure` `@match` is relative to the level above it unless it is
+ * anchored, which is exactly how the traversal already descends — so a relative
+ * path needs no special case, only a leading separator to scan it with.
+ *
+ * All three spellings of "relative" appear in the normalised corpus:
+ * `div[@type='book']`, `./div` and `.//div[@type='fragment']`. The leading `.`
+ * is the context node these steps already start from, so dropping it is exact,
+ * and `.//` becomes the descendant axis it means.
+ */
+function parseMatch(match: string): CitationStep[] {
+  const trimmed = match.trim().replace(/^\./u, '');
+  return scanSteps(trimmed.startsWith('/') ? trimmed : `/${trimmed}`, match);
+}
+
+/**
+ * TEI's empty markers, which delimit text rather than contain it.
+ *
+ * A `citeStructure` may anchor a level on one — the normalised Odyssey cites its
+ * cards as `milestone[@unit='card']` — and mean the text *between* one marker and
+ * the next. These steps resolve a citation to one element and read its subtree,
+ * and a marker has no subtree, so honouring such a level yields the right number
+ * of units with nothing in any of them: a full document that reads as empty, with
+ * no error anywhere. Refusing it is the same position the parser already takes on
+ * milestone-anchored `cRefPattern` schemes.
+ */
+const MARKER_ELEMENTS = new Set(['milestone', 'lb', 'pb', 'cb', 'gb', 'anchor', 'ptr']);
+
+/**
+ * Read a `citeStructure` declaration: TEI's newer citation scheme, nested
+ * elements rather than one XPath template per depth.
+ *
+ * ```xml
+ * <citeStructure match="/TEI/text/body" use="@xml:base">
+ *   <citeStructure unit="book" match="div[@type='book']" use="@n">
+ *     <citeStructure unit="line" match="l" use="@n"/>
+ * ```
+ *
+ * It carries the same information as a chain of `cRefPattern`s and compiles to
+ * the same steps, so everything downstream is unchanged. `@unit` is what marks a
+ * level as citable: the outermost element above anchors the path and names no
+ * unit, and treating it as a level would put the edition's URN in every citation.
+ *
+ * A document may declare **several**, one per depth — Thucydides declares
+ * `book/chapter/section` and `book/chapter` side by side — which is the same
+ * arrangement as several `cRefPattern`s, and the deepest wins for the same
+ * reason: it is the granularity the edition actually makes citable.
+ *
+ * Returns null — so the caller falls back — when the document declares none, and
+ * whenever any declaration cannot be executed exactly. Two cases are worth
+ * naming. A level whose `@use` is not a plain attribute is not expressible here.
+ * And a level with several `citeStructure` children declares alternatives at one
+ * depth, which these steps cannot represent. A level anchored on a marker element
+ * is refused too — see `MARKER_ELEMENTS`. Any of them condemns the whole reading
+ * rather than just its own declaration: retreating to a shallower one that did
+ * compile would cite whole books where the edition cites sections, which looks
+ * perfectly healthy and is wrong.
+ */
+export function schemeFromCiteStructure(root: TeiElement, separator: string): ResolvedScheme | null {
+  const anchors = findElements(root, 'refsDecl').flatMap((declaration) =>
+    elementChildren(declaration).filter((child) => child.name === 'citeStructure'),
+  );
+
+  let deepest: ResolvedScheme | null = null;
+  for (const anchor of anchors) {
+    const compiled = compileCiteStructure(anchor, separator);
+    if (compiled === null) return null;
+    if (deepest === null || compiled.scheme.levels.length > deepest.scheme.levels.length) {
+      deepest = compiled;
+    }
+  }
+  return deepest;
+}
+
+/** Compile one `citeStructure` chain, outermost element in. */
+function compileCiteStructure(anchor: TeiElement, separator: string): ResolvedScheme | null {
+  const steps: CitationStep[] = [];
+  const levels: CitationLevel[] = [];
+  let group = 0;
+
+  for (let node: TeiElement | undefined = anchor; node !== undefined;) {
+    const match = node.attributes['match'];
+    if (match === undefined) return null;
+
+    let matchSteps: CitationStep[];
+    try {
+      matchSteps = parseMatch(match);
+    } catch {
+      return null;
+    }
+
+    const unit = node.attributes['unit'];
+    if (unit !== undefined) {
+      const attribute = USE_ATTRIBUTE.exec(node.attributes['use'] ?? '')?.[1];
+      const last = matchSteps.at(-1);
+      if (attribute === undefined || last === undefined) return null;
+      if (MARKER_ELEMENTS.has(last.name)) return null;
+      group += 1;
+      // The capture goes on the last step of this level's own path, so a level
+      // matched several elements deep still stands in for itself when the level
+      // below it is absent.
+      last.predicates.push({ attribute, kind: 'capture', group });
+      levels.push({ label: unit.toLowerCase(), element: last.name });
+    }
+
+    steps.push(...matchSteps);
+
+    const children: TeiElement[] = elementChildren(node).filter((child) => child.name === 'citeStructure');
+    if (children.length > 1) return null;
+    node = children[0];
+  }
+
+  // An anchor with no unit below it addresses the whole text and nothing in it.
+  if (levels.length === 0) return null;
+
+  return {
+    scheme: { source: 'citeStructure', levels, separator, pattern: asXPath(steps) },
+    steps,
+  };
+}
+
+/**
+ * Render steps as the `cRefPattern` that would have produced them.
+ *
+ * A `citeStructure` has no pattern string of its own, and reporting null would
+ * make the two declaration forms incomparable in exactly the runs meant to
+ * compare them.
+ */
+function asXPath(steps: CitationStep[]): string {
+  const path = steps
+    .map((step) => {
+      const predicates = step.predicates
+        .map((predicate) =>
+          predicate.kind === 'capture'
+            ? `[@${predicate.attribute}='$${String(predicate.group)}']`
+            : `[@${predicate.attribute}='${predicate.value}']`,
+        )
+        .join('');
+      return `${step.axis === 'descendant' ? '//' : '/'}${step.name}${predicates}`;
+    })
+    .join('');
+  return `#xpath(${path})`;
 }
 
 /** Name each capture group's level, outermost first. */

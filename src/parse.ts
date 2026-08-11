@@ -43,7 +43,7 @@ export function parseTeiDocument(xml: string, options: ParseOptions = {}): TeiDo
     throw new Error('the document has no <body>, so it contains no text to cite');
   }
 
-  const declared = schemeFromRefsDecl(root, separator);
+  const declared = schemeFromRefsDecl(root, separator, options.citeStructure ?? false);
   const resolved = resolveUnits(root, edition, declared, separator);
   const settings = flattenSettings(options);
 

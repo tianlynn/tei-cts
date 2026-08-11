@@ -8,6 +8,20 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`citeStructure: true` reads TEI's newer citation declaration**, in preference to `cRefPattern`
+  when a document carries both. **Off by default**, and no behaviour changes without it: the released
+  corpus was re-run and compared field by field against the previous run — 3,503 files, **0
+  differences**, the same 3,267 parsed and 1,036,211 units. Perseus's normalisation branches restructure
+  the body while keeping the old `cRefPattern` beside the new declaration, so on those documents the
+  retained pattern points through a `<div type="edition">` that has been removed and matches nothing;
+  the option is what makes them readable. A run over those branches parses 3,183 of 3,503, with 2,373
+  documents read through the new path. A declaration is refused, and the parser falls back as it would
+  to any unreadable scheme, when a level's `@use` is not a plain attribute, when a level declares
+  alternatives at one depth, or when a level is anchored on a marker element such as `milestone` —
+  that last case is real, and the corpus run is what caught it: the normalised Odyssey cites its cards
+  as `milestone[@unit='card']`, which honoured literally returned 207 units containing no text at all.
+  `CitationScheme.source` gains `'citeStructure'`. See `docs/corpus-testing.md`, finding 8.
+
 - **Named entities resolve without a DTD.** Documents declaring `&aelig;`, `&mdash;`, `&eacute;` and
   friends in an external DTD were rejected whole as malformed XML, because the DTD is never fetched —
   27 of the 3,503 texts in the corpus run failed that way. The **48 entity names that appear as live

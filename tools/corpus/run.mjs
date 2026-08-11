@@ -13,19 +13,29 @@
  * each record also carries coverage, per-document invariants, and the elements
  * the default policy has no opinion about.
  *
- *   node tools/corpus/run.mjs
+ *   node tools/corpus/run.mjs                        # released corpus, options as shipped
+ *   CORPUS=normalized node tools/corpus/run.mjs      # working branches, citeStructure on
  *   CORPUS_ROOT=fixtures node tools/corpus/run.mjs   # self-test, see README
  */
 import { closeSync, existsSync, openSync, readFileSync, statSync, writeSync } from 'node:fs';
 import { relative } from 'node:path';
-import { CORPUS_DIR, DIST, RESULTS, texts } from './paths.mjs';
+import { corpus, DIST, texts } from './paths.mjs';
 
 const { defaultElementPolicy, parseTeiDocument } = await import(DIST).catch(() => {
   throw new Error(`${DIST} is missing — run \`npm run build\` first`);
 });
 
-const ROOT = process.env.CORPUS_ROOT ?? CORPUS_DIR;
-if (!existsSync(ROOT)) throw new Error(`${ROOT} is missing — run \`npm run corpus:fetch\` first`);
+const CORPUS = corpus();
+const ROOT = CORPUS.dir;
+const RESULTS = CORPUS.results;
+if (!existsSync(ROOT)) {
+  throw new Error(`${ROOT} is missing — run \`CORPUS=${CORPUS.name} npm run corpus:fetch\` first`);
+}
+
+// Every record says which corpus and which options produced it, so two runs
+// cannot be compared without noticing that they were parsed differently.
+const OPTIONS = CORPUS.options;
+process.stderr.write(`${CORPUS.name}: parsing ${ROOT} with ${JSON.stringify(OPTIONS)}\n`);
 
 /** Elements the policy names, plus the ones it handles structurally. */
 const KNOWN = new Set([...Object.keys(defaultElementPolicy), 'choice', 'app', 'subst', 'body']);
@@ -87,7 +97,7 @@ for (const file of files) {
   count += 1;
 
   const bytes = statSync(file).size;
-  const record = { path, repo: path.split(/[/\\]/)[0], bytes };
+  const record = { corpus: CORPUS.name, path, repo: path.split(/[/\\]/)[0], bytes };
 
   let xml;
   try {
@@ -101,7 +111,7 @@ for (const file of files) {
 
   const t0 = performance.now();
   try {
-    const doc = parseTeiDocument(xml);
+    const doc = parseTeiDocument(xml, OPTIONS);
     record.ms = Number((performance.now() - t0).toFixed(2));
     record.ok = true;
     record.urn = doc.urn;

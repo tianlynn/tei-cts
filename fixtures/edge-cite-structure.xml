@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  Apollonius Rhodius, Argonautica — urn:cts:greekLit:tlg0001.tlg001.perseus-grc2
+  Opening of books 1 and 2, trimmed. Licensed CC BY-SA 4.0; see ATTRIBUTION.md.
+
+  Taken from PerseusDLCode/canonical-greekLit, branch `editing`, where the
+  normalisation project restructures the body and adds a citeStructure
+  declaration. Kept as the regression guard for transitional documents: the
+  edition div is gone, so the retained cRefPattern matches nothing, and only
+  the citeStructure describes the document as it now stands.
+-->
+<?xml-model href="https://raw.githubusercontent.com/PerseusDLCode/perseus-schemas/main/perseus_verse.rng" schematypens="http://relaxng.org/ns/structure/1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Argonautica</title>
+            <author>Apollonius Rhodius</author>
+            <editor>George W. Mooney</editor>
+            <sponsor>Perseus Project, Tufts University</sponsor>
+            <principal>Gregory Crane</principal>
+            <respStmt>
+               <resp>Prepared under the supervision of</resp>
+               <name>Bridget Almas</name>
+               <name>Lisa Cerrato</name>
+               <name>Rashmi Singhal</name>
+               <name>David Smith</name>
+            </respStmt>
+            <funder n="org:Tufts">Tufts University</funder>
+         </titleStmt>
+         <publicationStmt>
+            <publisher>Trustees of Tufts University</publisher>
+            <pubPlace>Medford, MA</pubPlace>
+            <authority>Perseus Project</authority>
+            <date type="release" cert="low">2002</date>
+            <idno type="filename">tlg0001.tlg001.perseus-grc2.xml</idno>
+            <availability>
+               <licence target="https://creativecommons.org/licenses/by-sa/4.0/">Available under a Creative Commons Attribution-ShareAlike 4.0 International License</licence>
+            </availability>
+            <idno type="CTS">urn:cts:greekLit:tlg0001.tlg001.perseus-grc2</idno>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Argonautica</title>
+                  <author>Apollonius Rhodius</author>
+                  <editor>George W. Mooney</editor>
+                  <imprint>
+                     <pubPlace>London</pubPlace>
+                     <publisher>Longmans, Green</publisher>
+                     <date>1912</date>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <refsDecl n="CTS">
+            <cRefPattern n="line" matchPattern="(\w+).(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:l[@n='$2'])">
+               <p>This pointer pattern extracts book and line</p>
+            </cRefPattern>
+            <cRefPattern n="book" matchPattern="(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+               <p>This pointer pattern extracts book</p>
+            </cRefPattern>
+         </refsDecl>
+         <editorialDecl>
+            <correction method="silent">
+               <p>professional data entry</p>
+            </correction>
+         </editorialDecl>
+         <refsDecl>
+            <refState unit="book"/>
+            <refState unit="line"/>
+         </refsDecl>
+         <refsDecl n="CTS" xml:id="CTS">
+            <citeStructure match="/TEI/text/body" use="@xml:base">
+               <citeStructure unit="book" delim=":" match="div[@type='book']" use="@n">
+                  <citeStructure unit="line" delim="." match="l" use="@n"/>
+               </citeStructure>
+            </citeStructure>
+         </refsDecl>
+      </encodingDesc>
+      <profileDesc>
+         <textClass>
+            <catRef scheme="#perseus-genre" target="#verse-book-line"/>
+         </textClass>
+         <langUsage>
+            <language ident="grc">Greek</language>
+         </langUsage>
+      </profileDesc>
+      <revisionDesc>
+         <change when="2017-03-24" who="Lisa Cerrato">fixed missing line numbers and reordered milestones as appropriate</change>
+         <change when="2015-04-17" who="Stella Dee">converted to CTS EpiDoc</change>
+         <change when="2013-09-13" who="balmas01">moving Greg's work-in-progress on CTS-izing greco-roman collection texts to a Work directory</change>
+         <change when="2013-06-13" who="gcrane">tagging now should be compatible with CTS</change>
+         <change when="2011-09-07" who="rsingh04">adding rend=displayNum or rend=displayNumAndIndent to lb tags</change>
+         <change when="2011-01-12" who="gcrane">common nouns now reduced to lower case</change>
+         <change when="2011-01-01" who="gcrane">Q tags added; LB tags replace L tags (so that we can have Q tags)</change>
+         <change when="2010-06-21" who="gcrane">small fixes to the beta code</change>
+         <change when="2009-10-07" who="rsingh04">began reorganizing texts module by collection.  created separate work directory in texts module to keep hopper files separate from in progress files</change>
+         <change when="2009-05-27" who="rsingh04">added cvs log keyword</change>
+         <change when="2002-07-24" who="AEM">Initial markup</change>
+      </revisionDesc>
+   </teiHeader>
+   <text xml:lang="grc">
+      <body xml:base="urn:cts:greekLit:tlg0001.tlg001.perseus-grc2">
+         <div n="1" type="book">
+            <milestone unit="card" n="1"/>
+            <l n="1">ἀρχόμενος σέο, Φοῖβε, παλαιγενέων κλέα φωτῶν</l>
+            <l n="2">μνήσομαι, οἳ Πόντοιο κατὰ στόμα καὶ διὰ πέτρας</l>
+            <l n="3">Κυανέας βασιλῆος ἐφημοσύνῃ Πελίαο</l>
+            <l n="4">χρύσειον μετὰ κῶας ἐύζυγον ἤλασαν Ἀργώ.</l>
+            <milestone unit="para"/>
+            <l n="5">τοίην γὰρ Πελίης φάτιν ἔκλυεν, ὥς μιν ὀπίσσω</l>
+            <l n="6">μοῖρα μένει στυγερή, τοῦδʼ ἀνέρος, ὅντινʼ ἴδοιτο</l>
+            <l n="7">δημόθεν οἰοπέδιλον, ὑπʼ ἐννεσίῃσι δαμῆναι.</l>
+            <l n="8">δηρὸν δʼ οὐ μετέπειτα τεὴν κατὰ βάξιν Ἰήσων</l>
+            <l n="9">χειμερίοιο ῥέεθρα κιὼν διὰ ποσσὶν Ἀναύρου</l>
+            <l n="10">ἄλλο μὲν ἐξεσάωσεν ὑπʼ ἰλύος, ἄλλο δʼ ἔνερθεν</l>
+         </div>
+         <div n="2" type="book">
+            <milestone unit="card" n="1"/>
+            <l n="1">ἔνθα δʼ ἔσαν σταθμοί τε βοῶν αὖλίς τʼ Ἀμύκοιο,</l>
+            <l n="2">Βεβρύκων βασιλῆος ἀγήνορος, ὅν ποτε νύμφη</l>
+            <l n="3">τίκτε Ποσειδάωνι Γενεθλίῳ εὐνηθεῖσα</l>
+            <l n="4">Βιθυνὶς Μελίη, ὑπεροπληέστατον ἀνδρῶν·</l>
+            <l n="5">ὅς τʼ ἐπὶ καὶ ξείνοισιν ἀεικέα θεσμὸν ἔθηκεν,</l>
+            <l n="6">μήτινʼ ἀποστείχειν, πρὶν πειρήσασθαι ἑοῖο</l>
+            <l n="7">πυγμαχίης· πολέας δὲ περικτιόνων ἐδάιξεν.</l>
+            <l n="8">καὶ δὲ τότε προτὶ νῆα κιών, χρειώ μιν ἐρέσθαι</l>
+            <l n="9">ναυτιλίης, οἵ τʼ εἶεν, ὑπερβασίῃσιν ἄτισσεν,</l>
+            <l n="10">τοῖον δʼ ἐν πάντεσσι παρασχεδὸν ἔκφατο μῦθον·</l>
+            <milestone unit="para"/>
+         </div>
+      </body>
+   </text>
+</TEI>

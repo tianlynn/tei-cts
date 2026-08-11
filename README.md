@@ -94,6 +94,30 @@ the structure is read instead and `citation.source` is `'inferred'` rather than 
 inference independently reproduces the declared scheme of every edition in the test corpus, which is
 also how the two paths check each other.
 
+### `citeStructure`, for editions that have been normalised
+
+TEI's newer way of declaring the same thing is `citeStructure`: nested elements carrying `@match`,
+`@use` and `@unit` instead of one XPath template per depth. Perseus is
+[migrating to it](https://github.com/PerseusDLCode/MinimumViablePerseus/discussions/56), and its
+working branches restructure the body at the same time — the `<div type="edition">` wrapper is
+removed, so the `cRefPattern` those files still carry points through an element that is no longer
+there. It matches nothing, and only the `citeStructure` describes the document as it now stands.
+
+```ts
+parseTeiDocument(xml, { citeStructure: true }); // citation.source === 'citeStructure'
+```
+
+**Off by default.** No published edition uses `citeStructure` yet — 0 of the 3,503 texts in the three
+released corpora — and turning it on changes which declaration wins on any document carrying both.
+That is a behavioural change, not a fix, so it is yours to opt into. Turn it on to read a normalised
+edition; leave it off for anything currently released.
+
+The declaration is refused, and the parser falls back as it would to any unreadable scheme, when a
+level's `@use` is not a plain attribute, when a level offers several alternatives at one depth, or
+when a level is anchored on a **marker element** — `milestone`, `lb`, `pb`. That last one matters:
+the normalised Odyssey cites its cards as `milestone[@unit='card']`, meaning the text _between_ two
+markers, and honouring it literally would return 207 units containing nothing at all.
+
 ## Reading text
 
 Units contain the text a reader would see in the printed edition. Apparatus, commentary and print
@@ -202,8 +226,8 @@ another entity, and the five XML names cannot be redefined.
   What the DTDs declare arrives here as the two compiled-in tables above, sourced offline and
   switchable, not as anything the parser does at runtime.
 - **Milestone-anchored citation** — schemes that cite the text _between_ two markers, as some Plato and
-  Aristotle editions do — is not supported. Such a scheme is detected and falls back to inference
-  rather than producing subtly wrong units.
+  Aristotle editions do — is not supported, in either declaration form. Such a scheme is detected and
+  falls back to inference rather than producing subtly wrong units.
 
 ## Development
 
@@ -212,12 +236,15 @@ npm ci
 npm run build && npm run typecheck && npm run lint && npm test -- --coverage
 ```
 
-Seven fixtures cannot tell you how the parser behaves on shapes they do not contain, so the repo also
+Fixtures cannot tell you how the parser behaves on shapes they do not contain, so the repo also
 carries the harness that runs it over every text in canonical-greekLit, canonical-latinLit and
-First1KGreek — 3,503 files, 898 MB:
+First1KGreek — 3,503 files, 898 MB. It runs over **two** corpora, because upstream is mid-migration:
+the released branches, parsed as shipped, and Perseus's working branches, parsed with
+`citeStructure: true`. Each must hold on its own.
 
 ```bash
-npm run corpus   # fetch, parse everything, write a findings report
+npm run corpus              # released branches, options as shipped
+npm run corpus:normalized   # working branches, citeStructure on
 ```
 
 It downloads the corpora and writes its output to `.corpus/`, which is git-ignored; `rm -rf .corpus`

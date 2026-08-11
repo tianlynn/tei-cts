@@ -16,14 +16,23 @@ export type CitationLevel = {
 
 export type CitationScheme = {
   /**
-   * Where the scheme came from. `inferred` means the document declared none and
-   * the structure was read instead — worth surfacing, because it is a guess.
+   * Where the scheme came from.
+   *
+   * `refsDecl` is a `cRefPattern` declaration; `citeStructure` is the newer
+   * nested form, read only when `ParseOptions.citeStructure` is on; `inferred`
+   * means the document declared neither and the structure was read instead —
+   * worth surfacing, because it is a guess.
    */
-  source: 'refsDecl' | 'inferred';
+  source: 'refsDecl' | 'citeStructure' | 'inferred';
   levels: CitationLevel[];
   /** What joins level values into `CitableUnit.citation`. */
   separator: string;
-  /** The raw `replacementPattern`, kept verbatim for debugging. Null when inferred. */
+  /**
+   * The `replacementPattern` this scheme resolved to, kept verbatim for
+   * debugging. Null when inferred. A `citeStructure` scheme has no such string
+   * of its own, so it reports the equivalent XPath, which makes a scheme read
+   * from either declaration directly comparable with the other.
+   */
   pattern: string | null;
 };
 
@@ -100,6 +109,24 @@ export type ParseOptions = {
   normalize?: 'NFC' | 'NFD' | 'none';
   /** Override the separator that joins citation levels. Defaults to '.'. */
   citationSeparator?: string;
+  /**
+   * Read a `citeStructure` declaration in preference to a `cRefPattern` one.
+   * Defaults to `false`.
+   *
+   * `citeStructure` is TEI's newer way of declaring a citation scheme: nested
+   * elements carrying `@match`, `@use` and `@unit` instead of one XPath template
+   * per depth. Perseus is migrating to it, and its transitional documents carry
+   * **both** declarations while the body is restructured underneath — at which
+   * point the retained `cRefPattern` still names a wrapper element that has been
+   * removed, so it matches nothing and only the `citeStructure` describes the
+   * document as it now is.
+   *
+   * Off by default because no published edition uses it yet, and because turning
+   * it on changes which declaration wins — a behavioural change, not a fix, on
+   * any document carrying both. Turn it on to read a normalised edition; leave
+   * it off for anything currently released.
+   */
+  citeStructure?: boolean;
   /**
    * Resolve the 48 named entities the Perseus corpora actually use — `&aelig;`,
    * `&mdash;`, `&eacute;` — which XML does not predefine. Defaults to `true`.

@@ -9,6 +9,11 @@ The run itself changed nothing: it was a measurement exercise, and its findings 
 recommendations. Findings **1 and 2 have since been applied and the corpus re-run** — the blockquote on
 each carries the measured effect, which for finding 2 was not the effect predicted.
 
+Finding **8** was added later, and is different in kind: it measures a corpus that does not exist yet
+for consumers, on Perseus's own normalisation branches, and it is the reason the harness now runs
+over two corpora rather than one. Its answer is negative — the normalised branches read **worse**
+than the released ones today — which is worth knowing precisely rather than assuming either way.
+
 ## Method
 
 ### Corpora
@@ -293,6 +298,72 @@ matter — all currently folded into the reading text. `delSpan`/`addSpan` are t
 resident memory reached 648 MB on the largest files, which is worth knowing for a memory-limited
 environment but caused no failure.
 
+### 8. The corpus is about to change shape — `citeStructure`, measured on the branch
+
+Perseus is normalising its encoding, and [announced](https://github.com/PerseusDLCode/MinimumViablePerseus/discussions/56)
+that this replaces `cRefPattern` with TEI's newer `citeStructure` and restructures the body at the
+same time. That is not a future concern to note and forget: the work exists on branches now, and a
+document normalised halfway is worse for this parser than either end state, because it keeps the old
+declaration beside the new one and only the new one is true.
+
+**In the released corpora this is zero risk today: 0 of 3,503 files contain a `citeStructure`, 3,247
+contain a `cRefPattern`.** So the harness now runs over **two** corpora, with different options —
+released as shipped, normalised with `citeStructure: true`. See `tools/corpus/README.md`.
+
+```
+released    3,503 files · 3,267 parsed · 236 failed · 93.3% · 1,036,211 units
+normalized  3,503 files · 3,183 parsed · 320 failed · 90.9% ·   948,841 units
+```
+
+The released numbers are **identical to the previous run, record for record** — 3,503 files compared
+field by field, 0 differences. That is the point of the option defaulting to off, and it is checked
+rather than asserted.
+
+On the normalised branches, `citeStructure` is already the majority declaration:
+
+| Source          | Files | Note                                        |
+| --------------- | ----: | ------------------------------------------- |
+| `citeStructure` | 2,373 | normalised, read by the new path            |
+| `refsDecl`      |   684 | not yet normalised; the old path, unchanged |
+| `inferred`      |   126 | declared nothing either way                 |
+
+**Two defects in the new reader were found by this run, not by review.** Both are the kind only a
+corpus shows. The first: a `@match` may be written `div[@type='book']`, `./div` or
+`.//div[@type='fragment']`, and refusing the last two condemned 102 files that had perfectly readable
+declarations. The second is the serious one. The normalised Odyssey cites its cards as
+`milestone[@unit='card']` — the text _between_ two markers — and a marker has no subtree, so the
+first implementation returned **207 units containing nothing at all, with no error**: a whole work
+reading as empty, which every count in this document would have called healthy. Levels anchored on a
+marker element are now refused, and the file fails loudly instead. That is finding 3's limitation
+reappearing inside the new declaration form, and it is why the corpus run had to come before the
+release rather than after it.
+
+What the remaining difference is, and is not:
+
+- **81,837 of the 87,370 missing units are a change of granularity, not lost text.** 213 files cite
+  at a different depth than they did, with coverage unchanged to within 2%. The Iliad is the clearest:
+  its new declaration is `book/card`, not `book/line`, so it yields 248 units where it yielded 15,687
+  — and coverage reads 0.9997 in both. Cards are Perseus's paging unit, and their own report lists
+  `book+card` as an open question, not a decision.
+- **23 files do lose text**, because the new declaration does not cover the body. `tlg0067.tlg001`
+  declares one `div[@type='section']` and drops to 1.9% coverage from 98.9%.
+- **87 files parse on the released branch and fail on the normalised one.** Nearly all report
+  `no citable units matched`, naming the step: `tlg0064.tlg001` declares
+  `div[@type='textpart'][@subtype='paragraph']` while its body now holds `div[@type='paragraph']`.
+  The declaration and the document have been normalised to different conventions.
+
+None of the last three is this parser's to fix, and none should be quietly worked around: they are
+upstream work in progress, and the value of running the branch is being able to say precisely which
+file disagrees with itself and where.
+
+**Verdict: the normalised corpus improves nothing today, and that is the finding.** It parses 84
+fewer files than the released one, cites 213 works at a coarser depth, and loses text in 23. Nobody
+should switch to it, and `citeStructure` is off by default for that reason and not only for
+compatibility. What the work buys is readiness and a measurement: when a normalised edition does
+arrive, one option reads it, and the harness can already say — file by file — whether the migration
+has improved or damaged the corpus. Re-run it when the branches move. **Parsing work stops here**;
+the remaining differences belong to Perseus, not to this parser.
+
 ## Limitations
 
 This exercise establishes that the parser does not crash, contradicts neither itself nor the schemes
@@ -324,6 +395,32 @@ the notes on those findings above; the rest are not:
    which fail-open currently admits into the reading text.
 6. **Consider adopting a handful of the 117 shapes as fixtures** — `chapter/verse`, `poem/line` and a
    ragged hierarchy would each cover a path nothing tests today.
+
+Added after finding 8, and **applied**:
+
+7. **Read `citeStructure`, behind an option that defaults to off** (finding 8). Applied, with a second
+   corpus and a fixture. It recovers no coverage — see the verdict on that finding — and was done for
+   readiness rather than for a number.
+
+### TODO: report the malformed files upstream
+
+Not a parser change — these are source defects, and the rejections are correct. They are recorded
+here because the corpus run is the only thing that finds them, and because two of the three have
+never been reported.
+
+| File                           | Error                               | Upstream                                                                                |
+| ------------------------------ | ----------------------------------- | --------------------------------------------------------------------------------------- |
+| `phi0972.phi001p.perseus-eng1` | `266:7 unmatched closing tag: body` | 4 issues on `phi0972`, all closed; a `0972-refactored` branch exists with nothing on it |
+| `phi0972.phi001p.perseus-lat1` | `526:7 unmatched closing tag: body` | as above                                                                                |
+| `phi0692.phi009.perseus-lat1`  | `409:33 unexpected close tag`       | **never reported** — zero issues mention `phi0692`                                      |
+
+A fourth exists only on the normalisation branch and is worth reporting there rather than to the
+released repo: `tlg0013.tlg003.perseus-eng2` line 157 has `<milestone type="startquote" -->`, an
+element start tag closed with a comment terminator — a comment-stripping step in the pipeline that
+removed the `<!--` and left the `-->`.
+
+Each needs a line number and the surrounding markup, which the JSONL already carries; the parser's
+own message is close to a usable bug report as it stands.
 
 ## Repeating this
 

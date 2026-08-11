@@ -6,9 +6,14 @@
  * they say where to look.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { REPORT, RESULTS } from './paths.mjs';
+import { corpus } from './paths.mjs';
 
-if (!existsSync(RESULTS)) throw new Error(`${RESULTS} is missing — run \`npm run corpus:run\` first`);
+const CORPUS = corpus();
+const { report: REPORT, results: RESULTS } = CORPUS;
+
+if (!existsSync(RESULTS)) {
+  throw new Error(`${RESULTS} is missing — run \`CORPUS=${CORPUS.name} npm run corpus:run\` first`);
+}
 
 const records = readFileSync(RESULTS, 'utf8')
   .split('\n')
@@ -38,7 +43,8 @@ const group = (items, key) => {
   return [...map.entries()].sort((a, b) => b[1].length - a[1].length);
 };
 
-say('# Corpus run — findings\n');
+say(`# Corpus run — findings (${CORPUS.name})\n`);
+say(`Parsed with \`${JSON.stringify(CORPUS.options)}\`.\n`);
 
 // 1. Totals
 say('## Totals\n');
@@ -93,11 +99,15 @@ else {
 
 // 3. Scheme census
 say('## Citation schemes\n');
+// citeStructure is counted separately from cRefPattern rather than folded in
+// with it: on the normalised corpus its share is the measure of how far the
+// migration has actually got, which a combined "declared" column would hide.
 table(
-  ['Corpus', 'refsDecl', 'inferred', 'inferred %'],
+  ['Corpus', 'cRefPattern', 'citeStructure', 'inferred', 'inferred %'],
   group(ok, (r) => r.repo).map(([repo, rs]) => {
-    const inferred = rs.filter((r) => r.scheme.source === 'inferred').length;
-    return [repo, rs.length - inferred, inferred, `${pct(inferred, rs.length)}%`];
+    const count = (source) => rs.filter((r) => r.scheme.source === source).length;
+    const inferred = count('inferred');
+    return [repo, count('refsDecl'), count('citeStructure'), inferred, `${pct(inferred, rs.length)}%`];
   }),
 );
 
