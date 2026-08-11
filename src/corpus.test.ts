@@ -73,6 +73,17 @@ const shapes = [
     kind: 'paragraph',
     text: 'Gallia est omnis divisa in partes tres',
   },
+  {
+    // Ragged: 21 sections, only section 18 has numbered subsections. Units
+    // therefore appear at two different depths in one document.
+    file: 'edge-ragged-hierarchy.xml',
+    levels: ['section:div', 'subsection:div'],
+    units: 22,
+    first: '1',
+    last: '21',
+    kind: 'paragraph',
+    text: 'Δυνατὸν δέ ἐστί καὶ οὕτως.',
+  },
 ] as const;
 
 const parsed = new Map<string, TeiDocument>(
@@ -96,10 +107,13 @@ describe('parseTeiDocument over the corpus', () => {
 });
 
 describe('corpus invariants', () => {
-  it('gives every unit one value per declared level', () => {
+  it('gives every unit a value for each level it reaches, and no blanks', () => {
+    // Not exact equality with the declared depth: an edition may be ragged, and
+    // a division with nothing below it is cited by the levels it actually has.
     for (const [file, doc] of documents()) {
       for (const unit of doc.units) {
-        expect(unit.path, file).toHaveLength(doc.citation.levels.length);
+        expect(unit.path.length, `${file} ${unit.citation}`).toBeGreaterThanOrEqual(1);
+        expect(unit.path.length, `${file} ${unit.citation}`).toBeLessThanOrEqual(doc.citation.levels.length);
         expect(
           unit.path.every((part) => part !== ''),
           file,

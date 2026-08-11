@@ -196,7 +196,19 @@ function levelsFor(steps: CitationStep[], labels: Map<number, string>): Citation
  * which is why it doubles as a cross-check on the declared path in the tests.
  */
 export function inferScheme(edition: TeiElement, separator: string): ResolvedScheme {
-  const steps: CitationStep[] = [{ axis: 'descendant', name: edition.name, predicates: [] }];
+  // Pin the anchor to the edition division. A bare `descendant div` would also
+  // match the divisions *inside* it, so the same subtree would be walked from
+  // several starting points and cited more than once.
+  const anchor: CitationPredicate[] = [];
+  for (const attribute of ['type', 'n']) {
+    const value = edition.attributes[attribute];
+    if (value !== undefined) {
+      anchor.push({ attribute, kind: 'literal', value });
+      break;
+    }
+  }
+
+  const steps: CitationStep[] = [{ axis: 'descendant', name: edition.name, predicates: anchor }];
   const levels: CitationLevel[] = [];
   let group = 0;
   let current = edition;

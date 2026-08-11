@@ -123,6 +123,130 @@ describe('parseTeiDocument', () => {
   });
 });
 
+describe('ragged hierarchies', () => {
+  const twoLevel = (body: string) =>
+    document({
+      refsDecl: `<refsDecl n="CTS">
+        <cRefPattern n="subsection" matchPattern="(\\w+).(\\w+)"
+          replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])"/>
+        <cRefPattern n="section" matchPattern="(\\w+)"
+          replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+      </refsDecl>`,
+      body,
+    });
+
+  it('cites a division that has no deeper level at the level it does have', () => {
+    const doc = parseTeiDocument(
+      twoLevel('<div n="1"><div n="1"><p>deep</p></div></div><div n="2"><p>shallow</p></div>'),
+    );
+
+    expect(doc.units.map((unit) => unit.citation)).toEqual(['1.1', '2']);
+    expect(doc.units.map((unit) => unit.path)).toEqual([['1', '1'], ['2']]);
+  });
+
+  it('keeps the text that the deepest-level-only traversal used to drop', () => {
+    const doc = parseTeiDocument(
+      twoLevel('<div n="1"><div n="1"><p>deep</p></div></div><div n="2"><p>shallow</p></div>'),
+    );
+
+    expect(doc.units.map((unit) => unit.text)).toEqual(['deep', 'shallow']);
+  });
+
+  it('lets path length name the level a unit sits at', () => {
+    const doc = parseTeiDocument(
+      twoLevel('<div n="1"><div n="1"><p>deep</p></div></div><div n="2"><p>shallow</p></div>'),
+    );
+    const levelOf = (unit: (typeof doc.units)[number]) => doc.citation.levels[unit.path.length - 1]?.label;
+
+    expect(doc.units.map(levelOf)).toEqual(['subsection', 'section']);
+  });
+
+  it('gives a shallower unit the kind of the element it resolved to', () => {
+    const doc = parseTeiDocument(twoLevel('<div n="1"><p>shallow</p></div>'));
+
+    expect(doc.units[0]!.kind).toBe('paragraph');
+    expect(doc.units[0]!.element).toBe('div');
+  });
+
+  it('introduces no duplicate citations', () => {
+    const doc = parseTeiDocument(
+      twoLevel(
+        '<div n="1"><div n="1"><p>a</p></div><div n="2"><p>b</p></div></div>' +
+          '<div n="2"><p>c</p></div><div n="3"><p>d</p></div>',
+      ),
+    );
+    const citations = doc.units.map((unit) => unit.citation);
+
+    expect(citations).toEqual(['1.1', '1.2', '2', '3']);
+    expect(new Set(citations).size).toBe(citations.length);
+  });
+
+  it('falls back at several depths at once', () => {
+    const doc = parseTeiDocument(
+      document({
+        refsDecl: `<refsDecl n="CTS">
+          <cRefPattern n="section" matchPattern="(\\w+).(\\w+).(\\w+)"
+            replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']/tei:div[@n='$3'])"/>
+          <cRefPattern n="chapter" matchPattern="(\\w+).(\\w+)"
+            replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])"/>
+          <cRefPattern n="book" matchPattern="(\\w+)"
+            replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"/>
+        </refsDecl>`,
+        body:
+          '<div n="1"><div n="1"><div n="1"><p>full</p></div></div><div n="2"><p>two</p></div></div>' +
+          '<div n="2"><p>one</p></div>',
+      }),
+    );
+
+    expect(doc.units.map((unit) => unit.citation)).toEqual(['1.1.1', '1.2', '2']);
+    expect(doc.units.map((unit) => unit.path.length)).toEqual([3, 2, 1]);
+  });
+
+  it('leaves loose text beside a deeper division unemitted, which is the known limitation', () => {
+    // A division holding BOTH deeper divisions and its own text cannot be
+    // emitted without duplicating its children, so the loose text is dropped.
+    // Measured at under 0.1% of any affected file in the corpus run; pinned
+    // here so the gap stays a recorded decision.
+    const doc = parseTeiDocument(twoLevel('<div n="1"><p>loose intro</p><div n="1"><p>deep</p></div></div>'));
+
+    expect(doc.units.map((unit) => unit.citation)).toEqual(['1.1']);
+    expect(doc.units[0]!.text).toBe('deep');
+  });
+
+  it('still throws when nothing matches at any level', () => {
+    const xml = document({
+      refsDecl: `<refsDecl n="CTS"><cRefPattern n="line" matchPattern="(\\w+)"
+        replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:absent[@n='$1'])"/></refsDecl>`,
+      body: '<p>nothing numbered here</p>',
+    });
+
+    expect(() => parseTeiDocument(xml)).toThrow(/step 4 of 4 \(child <absent>\[@n\]\)/);
+  });
+});
+
+describe('the ragged-hierarchy fixture', () => {
+  // Anonymi Logica et Quadrivium: 21 sections, only 2 with a numbered
+  // subsection. Before the per-division fallback this yielded 2 units and lost
+  // nine tenths of the work.
+  const doc = parseTeiDocument(readFixture('edge-ragged-hierarchy.xml'));
+
+  it('reads its declared two-level scheme', () => {
+    expect(doc.citation.source).toBe('refsDecl');
+    expect(doc.citation.levels.map((level) => level.label)).toEqual(['section', 'subsection']);
+  });
+
+  it('cites every section, not only the two with subsections', () => {
+    expect(doc.units.length).toBeGreaterThan(20);
+    expect(doc.units.filter((unit) => unit.path.length === 2)).toHaveLength(2);
+  });
+
+  it('recovers the text that used to be dropped', () => {
+    const chars = doc.units.reduce((total, unit) => total + unit.text.length, 0);
+
+    expect(chars).toBeGreaterThan(15000);
+  });
+});
+
 describe('inferring a scheme from structure', () => {
   it('names levels from the divisions subtype, whatever its casing', () => {
     // The Iliad writes subtype="Book" where the Odyssey writes "book".

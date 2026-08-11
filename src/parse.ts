@@ -108,11 +108,22 @@ function resolveUnits(
 }
 
 /**
- * Capture groups are 1-based and may be sparse if a scheme skips one, so the
- * values are read by level index rather than by filtering the array.
+ * Capture groups are 1-based, so level *k* is `values[k]`.
+ *
+ * The path stops at the first level the match did not reach. A unit that sits
+ * above the deepest declared level — a section in an edition where only some
+ * sections have numbered subsections — is cited by the levels it actually has,
+ * so it reads `1` rather than `1.` or `1.0`.
  */
-const pathOf = (match: UnitMatch, depth: number): string[] =>
-  Array.from({ length: depth }, (_, index) => match.values[index + 1] ?? '');
+function pathOf(match: UnitMatch, depth: number): string[] {
+  const path: string[] = [];
+  for (let level = 1; level <= depth; level += 1) {
+    const value = match.values[level];
+    if (value === undefined) break;
+    path.push(value);
+  }
+  return path;
+}
 
 const citationOf = (match: UnitMatch, depth: number, separator: string): string =>
   pathOf(match, depth).join(separator);

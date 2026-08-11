@@ -26,6 +26,10 @@ export type TraversalResult = {
   reached: number[];
 };
 
+/** Does this step contribute a component to the citation, rather than just structure? */
+const captures = (step: CitationStep): boolean =>
+  step.predicates.some((predicate) => predicate.kind === 'capture');
+
 const satisfies = (element: TeiElement, predicate: CitationPredicate): boolean => {
   const value = element.attributes[predicate.attribute];
   if (value === undefined) return false;
@@ -67,7 +71,19 @@ function run(root: TeiElement, steps: CitationStep[]): TraversalResult {
       if (index === steps.length - 1) {
         matches.push({ node: candidate, values: next });
       } else {
+        const before = matches.length;
         visit(candidate, index + 1, next);
+
+        // A division that holds nothing at the next declared level is itself
+        // the citable unit. Editions are routinely ragged — one section of a
+        // work has numbered subsections, the next does not — and without this
+        // the text of the shallower ones belongs to no unit and is silently
+        // lost. Only a step that captured a value can stand in: the leading
+        // steps of every pattern are structural, and emitting `<text>` as a
+        // unit would be a worse failure than the one this fixes.
+        if (matches.length === before && captures(step)) {
+          matches.push({ node: candidate, values: next });
+        }
       }
     }
   };

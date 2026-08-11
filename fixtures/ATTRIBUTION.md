@@ -1,8 +1,9 @@
 # Test fixture attribution
 
-These files are excerpts of TEI editions published by the [Perseus Digital Library](https://www.perseus.tufts.edu/),
-from the [`PerseusDL/canonical-greekLit`](https://github.com/PerseusDL/canonical-greekLit) and
-[`PerseusDL/canonical-latinLit`](https://github.com/PerseusDL/canonical-latinLit) repositories.
+These files are TEI editions from the [Perseus Digital Library](https://www.perseus.tufts.edu/) —
+[`PerseusDL/canonical-greekLit`](https://github.com/PerseusDL/canonical-greekLit) and
+[`PerseusDL/canonical-latinLit`](https://github.com/PerseusDL/canonical-latinLit) — and from
+[`OpenGreekAndLatin/First1KGreek`](https://github.com/OpenGreekAndLatin/First1KGreek).
 
 They are licensed **CC BY-SA 4.0** — <https://creativecommons.org/licenses/by-sa/4.0/> — and remain
 under that licence here. **They are not part of the published npm package**: `fixtures/` is excluded
@@ -39,3 +40,14 @@ Derived from `homer-odyssey.xml` by the modification named, and used to test the
 | `edge-no-refs-decl.xml`          | `refsDecl` removed, so the scheme must be inferred from structure                                                 |
 | `edge-unsupported-refs-decl.xml` | `replacementPattern` rewritten to use `position()` and `contains()`, which are outside the supported XPath subset |
 | `edge-no-body.xml`               | everything from `<text>` onward removed, leaving a header with nothing citable                                    |
+
+`edge-ragged-hierarchy.xml` is different in kind: a **complete, unmodified** work rather than a
+derived edge case.
+
+| File                        | Work                         | URN                                          |
+| --------------------------- | ---------------------------- | -------------------------------------------- |
+| `edge-ragged-hierarchy.xml` | Anonymi Logica et Quadrivium | `urn:cts:greekLit:tlg1799.tlg008.1st1K-grc1` |
+
+It declares a `section/subsection` citation scheme but numbers subsections in only 2 of its 21
+sections. It is kept as the regression guard for ragged hierarchies: before that case was handled,
+this document yielded 2 units and lost nine tenths of its text.

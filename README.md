@@ -67,6 +67,28 @@ actually has that attribute.** That is what stops Homer's `//tei:l[@n='$2']` fro
 unnumbered verse quotations embedded in Herodotus's prose. They are quoted poetry, not citable lines,
 and the edition says so by leaving them unnumbered.
 
+### Ragged hierarchies
+
+Editions do not always fill in every level they declare. A work may declare `section/subsection` and
+then number subsections in only a few of its sections. **A division with nothing below it is cited by
+the levels it actually has**, so it comes back as `18` rather than being skipped:
+
+```ts
+doc.citation.levels.map((l) => l.label); // ['section', 'subsection']
+doc.units.map((u) => u.citation); //        ['1', …, '18.1', '18.2', '19', …]
+doc.units.map((u) => u.path.length); //     [ 1,  …,  2,      2,      1,  …]
+```
+
+`path.length` therefore tells you which level a unit sits at —
+`citation.levels[unit.path.length - 1]` names it. Emitting these units is not optional politeness:
+before this behaviour existed, a work whose sections mostly lacked subsections returned only the few
+deepest units and silently dropped the rest of its text.
+
+One case remains unhandled. A division holding **both** deeper divisions and its own loose text emits
+the deeper divisions only; the loose text belongs to no unit, because emitting the parent as well
+would duplicate its children. This is rare — usually zero — but reaches a few percent in some
+editions that set poetry beside numbered prose verses.
+
 When a document declares no scheme, or declares one written with XPath outside the supported subset,
 the structure is read instead and `citation.source` is `'inferred'` rather than `'refsDecl'`. The
 inference independently reproduces the declared scheme of every edition in the test corpus, which is

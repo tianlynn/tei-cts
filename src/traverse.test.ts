@@ -54,6 +54,45 @@ describe('matchUnits', () => {
     expect(result.matches).toHaveLength(2);
   });
 
+  it('emits a division that contains nothing at the next declared level', () => {
+    // Without this the section's text belongs to no unit at all, which is how
+    // real editions silently lost most of their content.
+    const result = run(
+      '<div n="1"><div n="1"><p>deep</p></div></div><div n="2"><p>no subsection here</p></div>',
+      "/tei:TEI/tei:text/tei:body/tei:div[@n='$1']/tei:div[@n='$2']",
+    );
+
+    expect(result.matches.map((match) => match.values.slice(1).join('.'))).toEqual(['1.1', '2']);
+  });
+
+  it('does not also emit a division that has matches below it', () => {
+    // Emitting both parent and child would count the child's text twice.
+    const result = run(
+      '<div n="1"><div n="1"><p>a</p></div><div n="2"><p>b</p></div></div>',
+      "/tei:TEI/tei:text/tei:body/tei:div[@n='$1']/tei:div[@n='$2']",
+    );
+
+    expect(result.matches.map((match) => match.values.slice(1).join('.'))).toEqual(['1.1', '1.2']);
+  });
+
+  it('never falls back onto a step that captures nothing', () => {
+    // /tei:TEI and /tei:text are structural. Emitting one of those as a unit
+    // would be a worse failure than the one the fallback exists to fix.
+    const result = run('<p>nothing numbered at all</p>', "/tei:TEI/tei:text/tei:body/tei:div[@n='$1']");
+
+    expect(result.matches).toHaveLength(0);
+  });
+
+  it('falls back at more than one depth in the same document', () => {
+    const result = run(
+      '<div n="1"><div n="1"><div n="1"><p>full depth</p></div></div><div n="2"><p>stops at two</p></div></div>' +
+        '<div n="2"><p>stops at one</p></div>',
+      "/tei:TEI/tei:text/tei:body/tei:div[@n='$1']/tei:div[@n='$2']/tei:div[@n='$3']",
+    );
+
+    expect(result.matches.map((match) => match.values.slice(1).join('.'))).toEqual(['1.1.1', '1.2', '2']);
+  });
+
   it('reports how far a failing traversal got', () => {
     const result = run('<div n="1"><l n="1">a</l></div>', '/tei:TEI/tei:text/tei:body/tei:absent');
 

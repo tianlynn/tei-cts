@@ -32,7 +32,15 @@ export type UnitKind = 'line' | 'paragraph';
 export type CitableUnit = {
   /** '1.1' — the level values joined by the scheme separator. */
   citation: string;
-  /** ['1', '1'] — the same values unjoined, so a consumer never re-splits a string. */
+  /**
+   * ['1', '1'] — the same values unjoined, so a consumer never re-splits a string.
+   *
+   * May be **shorter** than `citation.levels`. Editions are routinely ragged —
+   * one section of a work has numbered subsections, the next does not — and a
+   * division with nothing below it is cited by the levels it actually has. So
+   * `path.length` tells you which level a unit sits at:
+   * `citation.levels[unit.path.length - 1]`.
+   */
   path: string[];
   kind: UnitKind;
   /** Local name of the element the citation resolved to: 'l', 'p', 'div'. */

@@ -4,6 +4,34 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — unreleased
+
+### Fixed
+
+- **Silent text loss on ragged hierarchies.** Units were emitted only where a document's full chain of
+  declared citation levels matched, so a division that stopped short of the deepest level had its text
+  belong to no unit at all — with no error. A run over all 3,503 texts in canonical-greekLit,
+  canonical-latinLit and First1KGreek found 21 files losing more than 20% of their text this way and
+  four losing more than 50%; one returned 2 units for a work of 21 sections. A division with nothing
+  at the next declared level is now itself the citable unit. Across the corpus this recovered ~1,900
+  units, and the worst-affected files went from 9.5%/15%/30%/39% text coverage to 75%/86%/94%/99.8%.
+- **Inferred schemes no longer cite a subtree more than once.** The inferred anchor was a bare
+  `descendant div`, which also matched divisions inside the edition division, so the same subtree
+  could be walked from several starting points. It is now pinned to the edition division. This removed
+  5 of the 12 corpus-wide duplicate-citation rejections.
+
+### Changed
+
+- **`CitableUnit.path` may now be shorter than `citation.levels`** — a unit above the deepest declared
+  level is cited by the levels it actually has (`18` rather than `18.1`). `path.length` identifies the
+  level: `citation.levels[unit.path.length - 1]`. Code assuming a fixed-length path needs updating.
+
+### Known limitation
+
+- A division holding both deeper divisions and its own loose text emits the deeper divisions only; the
+  loose text is not emitted, since emitting the parent too would duplicate its children. Usually zero,
+  but a few percent in editions that set poetry beside numbered prose verses.
+
 ## [0.1.0] — unreleased
 
 First release. The API is expected to move while it meets its first real consumers, hence `0.x`.

@@ -110,7 +110,25 @@ structures, was the right design.
 
 ## Findings
 
-### 1. Silent text loss on ragged hierarchies — a real defect
+### 1. Silent text loss on ragged hierarchies — a real defect — **fixed in 0.2.0**
+
+> **Fixed.** A division with nothing at the next declared level is now the citable unit itself. After
+> the fix, files losing more than 50% of their text fell from **4 to 0**, and those losing more than
+> 20% from **21 to 13**; the corpus gained ~1,900 units and total failures fell from 241 to 236. The
+> four worst files went from 9.5% / 15.1% / 29.7% / 39.2% coverage to **74.7% / 86.1% / 94.5% / 99.8%**.
+>
+> The 13 that remain are a different and milder thing: the mixed-division limitation below, plus
+> imprecision in the heuristic. In `tlg0527.tlg057` — the largest remaining — 6.4% of the chapter text
+> is poetry set beside numbered prose verses, which no unit claims. The original diagnosis that mixed
+> divisions are negligible held for the five files sampled for it, but not for the Septuagint volumes,
+> where it reaches a few percent.
+>
+> The fix also exposed a second bug it then fixed: the inferred-scheme anchor was a bare
+> `descendant div`, matching divisions inside the edition division as well as the division itself, so
+> one subtree could be walked from several starting points. Pinning the anchor removed 5 of the 12
+> duplicate-citation rejections.
+
+The description below is of the defect as found.
 
 **21 files (0.6%) lose more than 20% of their text with no error; 4 lose more than 50%.**
 
