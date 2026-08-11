@@ -37,4 +37,6 @@ jobs:
       - run: npm run build
       # Catches a broken exports map or a missing dist before anyone installs it.
       - run: npx publint
-      - run: npx --yes @arethetypeswrong/cli --pack
+      # The esm-only profile is the point: this package ships ESM only, so
+      # "a require() call resolved to ESM" is the intended design, not a defect.
+      - run: npx --yes @arethetypeswrong/cli --pack --profile esm-only
