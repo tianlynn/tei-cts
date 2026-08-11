@@ -195,6 +195,18 @@ npm ci
 npm run build && npm run typecheck && npm run lint && npm test -- --coverage
 ```
 
+Seven fixtures cannot tell you how the parser behaves on shapes they do not contain, so the repo also
+carries the harness that runs it over every text in canonical-greekLit, canonical-latinLit and
+First1KGreek — 3,503 files, 898 MB:
+
+```bash
+npm run corpus   # fetch, parse everything, write a findings report
+```
+
+It downloads the corpora and writes its output to `.corpus/`, which is git-ignored; `rm -rf .corpus`
+undoes it. See [`tools/corpus/README.md`](tools/corpus/README.md), and
+[`docs/corpus-testing.md`](docs/corpus-testing.md) for what a full run found.
+
 The test corpus is seven real Perseus excerpts covering every citation shape above, plus invariants
 asserted across all of them — citations unique and one value per level, no markup reaching the text,
 NFC stability, elision preserved, and citations provably independent of the element policy. Fixtures

@@ -29,7 +29,8 @@ they exercise the element policy harder than the Greek and Latin do.
 
 ### The harness
 
-Three throwaway scripts, kept outside this repo:
+Three scripts, committed at [`tools/corpus/`](../tools/corpus/). They were throwaway when this run was
+made; keeping them was the point of the run being repeatable:
 
 - **fetch** — download and extract the three tarballs, keeping only `data/`. Idempotent.
 - **run** — walk the corpus, parse each file, append one JSON record per file to a JSONL. It imports
@@ -307,8 +308,18 @@ the notes on those findings above; the rest are not:
 
 ## Repeating this
 
-The harness is not committed; it is three short scripts, and the description above is enough to
-rebuild them. What matters is the shape: parse everything, record one JSON line per file, and reduce
-that to error signatures, a scheme census, an unknown-element census, and outliers ranked by
-unexplained loss. The run takes about half a minute once the corpus is on disk, so it is cheap enough
-to repeat after any change to the citation logic or the element policy.
+```bash
+npm run corpus
+```
+
+That builds the package, downloads the three corpora, parses all 3,503 texts and writes the report —
+about four minutes the first time, half a minute per run after, since the download is the slow part
+and is skipped once it is on disk. Everything it touches lives in `.corpus/`, which is git-ignored, so
+a fresh clone can do this without producing a tracked change and `rm -rf .corpus` undoes it.
+[`tools/corpus/README.md`](../tools/corpus/README.md) documents the individual steps, the self-test
+against the committed fixtures, and the environment overrides.
+
+What matters more than the scripts is the shape: parse everything, record one JSON line per file, and
+reduce that to error signatures, a scheme census, an unknown-element census, and outliers ranked by
+unexplained loss. It is cheap enough to repeat after any change to the citation logic or the element
+policy — which is how the entity table of finding 2 was shown to recover nothing.

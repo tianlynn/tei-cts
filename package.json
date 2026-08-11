@@ -47,6 +47,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "corpus": "npm run build && npm run corpus:fetch && npm run corpus:run && npm run corpus:report",
+    "corpus:fetch": "node tools/corpus/fetch.mjs",
+    "corpus:run": "node tools/corpus/run.mjs",
+    "corpus:report": "node tools/corpus/report.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

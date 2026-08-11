@@ -1,9 +1,10 @@
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  // This file is JavaScript, so the type-aware rules have no project to read it
-  // from; linting it would mean adding it to the TypeScript program for nothing.
-  { ignores: ['dist/**', 'coverage/**', 'node_modules/**', 'eslint.config.js'] },
+  // This file and the corpus tooling are JavaScript, so the type-aware rules
+  // have no project to read them from; linting them would mean adding them to
+  // the TypeScript program for nothing. Prettier still formats them.
+  { ignores: ['dist/**', 'coverage/**', 'node_modules/**', '.corpus/**', 'eslint.config.js', 'tools/**'] },
   ...tseslint.configs.strictTypeChecked,
   {
     languageOptions: {
