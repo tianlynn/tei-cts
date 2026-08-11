@@ -1,5 +1,7 @@
 # tei-cts
 
+[![CI](https://github.com/tianlynn/tei-cts/actions/workflows/ci.yml/badge.svg)](https://github.com/tianlynn/tei-cts/actions/workflows/ci.yml)
+
 Parse CTS/CapiTainS TEI XML into citable text units.
 
 Feed it a Perseus edition, get back the reading text with a canonical citation on every line or
