@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Caesar, De Bello Gallico — urn:cts:latinLit:phi0448.phi001.perseus-lat2
+  Excerpt trimmed for testing. Licensed CC BY-SA 4.0; see ATTRIBUTION.md.
+-->
+<?xml-model href="https://epidoc.stoa.org/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader xml:lang="eng">
+<fileDesc>
+<titleStmt>
+<title xml:lang="lat">De bello Gallico</title>
+<author>Julius Caesar</author>
+<editor>T. Rice Holmes</editor>
+<sponsor>Perseus Project, Tufts University</sponsor>
+<principal>Gregory Crane</principal>
+<respStmt>
+<resp>Prepared under the supervision of</resp>
+<name>Lisa Cerrato</name>
+<name>William Merrill</name>
+<name>David Smith</name>
+</respStmt>
+<funder n="org:NEH">The National Endowment for the Humanities</funder>
+</titleStmt>
+
+<publicationStmt>
+<publisher>Trustees of Tufts University</publisher>
+<pubPlace>Medford, MA</pubPlace>
+<authority>Perseus Project</authority>
+<date type="release" when="1997-10-28">Perseus 2.5</date>
+<idno type="filename">phi0448.phi001.perseus-lat2.xml</idno>
+<availability>
+<licence target="https://creativecommons.org/licenses/by-sa/4.0/">Available under a Creative Commons Attribution-ShareAlike 4.0 International License</licence></availability>
+</publicationStmt> 
+
+<sourceDesc>
+<biblStruct>
+<monogr>
+<author>Julius Caesar</author>
+<title xml:lang="lat">C. Iuli Commentarii Rerum in Gallia Gestarum VII A. Hirti Commentarius VII</title>
+<editor>T. Rice Holmes</editor>
+<imprint>
+<pubPlace>Oxford</pubPlace>
+<publisher>Clarendon</publisher>
+<date>1914</date>
+</imprint>
+</monogr>
+<series>
+<title>Scriptorum Classicorum Bibliotheca Oxoniensis</title>
+</series>
+<ref target="https://archive.org/details/ciulicaesarisco00caesgoog">Internet Archive</ref>
+</biblStruct>
+</sourceDesc>
+</fileDesc>
+
+<encodingDesc>
+<refsDecl n="CTS">
+<cRefPattern n="section" matchPattern="(\w+).(\w+).(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']/tei:div[@n='$3'])">
+<p>This pointer pattern extracts book and chapter and section.</p>
+</cRefPattern>
+<cRefPattern n="chapter" matchPattern="(\w+).(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])">
+<p>This pointer pattern extracts book and chapter.</p>
+</cRefPattern>
+<cRefPattern n="book" matchPattern="(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])"> 
+<p>This pointer pattern extracts book.</p>
+</cRefPattern>
+</refsDecl>
+	
+<refsDecl>
+<refState unit="book" delim="."/>
+<refState unit="chapter" delim="."/>
+<refState unit="section"/>
+</refsDecl>
+</encodingDesc>
+
+<profileDesc>
+<langUsage>
+<language ident="lat">Latin</language>
+</langUsage>
+</profileDesc>
+
+<revisionDesc>
+<change when="2026-01-28" who="Lisa Cerrato">Refinements to header and other markup.</change>
+<change when="2016-01-22" who="Lisa Cerrato">EpiDoc and CTS conversion first pass including divs and refsDecl</change>
+<change when="2013-09-13" who="balmas01">moving Greg's work-in-progress on CTS-izing greco-roman collection texts to a Work directory</change>
+<change when="2013-06-08" who="gcrane">TEI XML converted to facilitate CTS compatibility</change>
+<change when="2013-01-22" who="lcerrato">rem changed to rei in 1.14.7</change>
+<change when="2011-11-18" who="lcerrato">typos collsilium to consilium</change>
+<change when="2011-10-31" who="lcerrato">changed Belgos to Belgas 2.4 according to source</change>
+<change when="2011-09-06" who="lcerrato">changed 1.7.1 eos per provincia nostram to eos per provinciam nostram, verified against source</change>
+<change when="2011-07-21" who="gcrane">small fixes</change>
+<change when="2011-01-17" who="gcrane">base SDL file</change>
+<change when="2010-07-20" who="lcerrato">fixed numbering issue of chapters at end of book 1 (44 to end) checked against source</change>
+<change when="2009-10-09" who="rsingh04">more reorganizing of texts module by collection</change>
+<change when="2009-09-17" who="lcerrato">fixed typo</change>
+<change when="2007-11-08" who="lcerrato">fixed typos as follows:
+1.24.3 conterri / conferri
+1.24.4 concertissima / confertissima
+1.29.1 Hevetiorum / Helvetiorum
+1.40.3 poslulatis / postulatis
+1.40.3 epudiaturum / repudiaturum
+1.40.5 emoria / memoria
+1.47.5 cognogcerent / cognoscerent
+2.4.3 Illagnosque / magnosque
+2.4.6 teracissimosque / feracissimosque
+2.5.2 comnlunisque / communisque
+2.5.5 ullum / unum</change>
+<change when="2005-08-01" who="packel">removed stray item tags</change>
+<change when="2005-07-25" who="packel">Converted to XML</change>
+<change when="2003-07-01" who="yorkc">Updated texts to TEI P4 and Perseus P4 extensions; minor cleanup (esp. character encodings and typos.)</change>
+<change when="2003-05-21" who="lcerrato">changed 2.3.5  potuelint to potuerint</change>
+<change when="2000-10-17" who="lcerrato">took out comma in middle of word at 5.52</change>
+<change when="2000-03-06" who="amahoney">remove header so small toc will show books</change>
+<change when="2000-03-06" who="textgod">fixed numbering problem at 4.22 ff.</change>
+<change when="2000-03-04" who="dasmith">Added separate funder entity to TEI header.</change>
+<change when="2000-02-25" who="textgod">fixed multiple typos and regularized spacing and capitalization</change>
+<change when="2000-02-25" who="textgod">fixed multiple typos</change>
+<change when="2000-02-22" who="textgod">fixed multiple typos</change>
+<change when="2000-02-22" who="textgod">fixed multiple typos</change>
+<change when="1999-11-19" who="lcerrato">fixed multiple typos</change>
+<change when="1999-10-14" who="lcerrato">fixed typo at 1.18.5</change>
+<change when="1999-08-04" who="textgod">Removed TEXT N.</change>
+<change when="1999-08-04" who="textgod">Re-inserted Hirtius.</change>
+<change when="1998-11-12" who="textgod">Fixed scanning errors.</change>
+<change when="1998-08-28" who="textgod">Fixed typo.</change>
+<change when="1997-12-19" who="textgod">Moved book eight into separate Hirtius file.</change>
+<change when="1997-10-17" who="textgod">FIxed sections and typos. Changed abbreviation.</change>
+<change when="1997-06-27" who="cjsu">removed book 8 because it was not written by Caesar</change>
+<change when="1997-06-25" who="cjsu">passed SGML Parsing</change>
+<change when="1996-04-03" who="DAS"></change>
+</revisionDesc>
+</teiHeader>
+
+<text>
+<body>
+<div type="edition"  xml:lang="lat" n="urn:cts:latinLit:phi0448.phi001.perseus-lat2">
+<div n="1" type="textpart" subtype="book" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2">
+<head>COMMENTARIUS PRIMUS</head>
+<div  type="textpart" subtype="chapter" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1" n="1">
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.1" n="1">
+<p>Gallia est omnis divisa in partes tres, quarum unam incolunt Belgae, aliam Aquitani, tertiam qui ipsorum lingua Celtae, nostra Galli appellantur.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.1" n="2">
+<p>Hi omnes lingua, institutis, legibus inter se differunt. Gallos ab Aquitanis Garumna flumen, a Belgis Matrona et Sequana dividit.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.1" n="3">
+<p>Horum omnium fortissimi sunt Belgae, propterea quod a cultu atque humanitate provinciae longissime absunt, minimeque ad eos mercatores saepe commeant atque ea quae ad effeminandos animos pertinent important,</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.1" n="4">
+<p>proximique sunt Germanis, qui trans Rhenum incolunt, quibuscum continenter bellum gerunt. Qua de causa Helvetii quoque reliquos Gallos virtute praecedunt, quod fere cotidianis proeliis cum Germanis contendunt, cum aut suis finibus eos prohibent aut ipsi in eorum finibus bellum gerunt.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.1" n="5">
+<p>[Eorum una pars, quam Gallos obtinere dictum est, initium capit a flumine Rhodano, continetur Garumna flumine, Oceano, finibus Belgarum, attingit etiam ab Sequanis et Helvetiis flumen Rhenum, vergit ad septentriones.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.1" n="6">
+<p>Belgae ab extremis Galliae finibus oriuntur, pertinent ad inferiorem partem fluminis Rheni, spectant in septentrionem et orientem solem.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.1" n="7">
+<p>Aquitania a Garumna flumine ad Pyrenaeos montes et eam partem Oceani quae est ad Hispaniam pertinet; spectat inter occasum solis et septentriones.]</p>
+</div></div>
+
+<div  type="textpart" subtype="chapter" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1" n="2">
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.2" n="1">
+<p>Apud Helvetios longe nobilissimus fuit et ditissimus Orgetorix. Is M. Messala, [et P.] M. Pisone consulibus regni cupiditate inductus coniurationem nobilitatis fecit et civitati persuasit ut de finibus suis cum omnibus copiis exirent:</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.2" n="2">
+<p>perfacile esse, cum virtute omnibus praestarent, totius Galliae imperio potiri.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.2" n="3">
+<p>Id hoc facilius iis persuasit, quod undique loci natura Helvetii continentur: una ex parte flumine Rheno latissimo atque altissimo, qui agrum Helvetium a Germanis dividit; altera ex parte monte Iura altissimo, qui est inter Sequanos et Helvetios; tertia lacu Lemanno et flumine Rhodano, qui provinciam nostram ab Helvetiis dividit.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.2" n="4">
+<p>His rebus fiebat ut et minus late vagarentur et minus facile finitimis bellum inferre possent;</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.2" n="5">
+<p>qua ex parte homines bellandi cupidi magno dolore adficiebantur.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.2" n="6">
+<p>Pro multitudine autem hominum et pro gloria belli atque fortitudinis angustos se fines habere arbitrabantur, qui in longitudinem milia passuum CCXL, in latitudinem CLXXX patebant.</p>
+</div></div>
+
+<div  type="textpart" subtype="chapter" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1" n="3">
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.3" n="1">
+<p>His rebus adducti et auctoritate Orgetorigis permoti constituerunt ea quae ad proficiscendum pertinerent comparare, iumentorum et carrorum quam maximum numerum coemere, sementes quam maximas facere, ut in itinere copia frumenti suppeteret, cum proximis civitatibus pacem et amicitiam confirmare.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.3" n="2">
+<p>Ad eas res conficiendas biennium sibi satis esse duxerunt; in tertium annum profectionem lege confirmant.</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.3" n="3">
+<p>Ad eas res conficiendas Orgetorix deligitur. Is sibi legationem ad civitates suscipit. In eo itinere persuadet Castico, Catamantaloedis filio, Sequano, cuius pater regnum in Sequanis multos annos obtinuerat et a senatu populi Romani amicus appellatus erat, ut regnum in civitate sua occuparet, quod pater ante habuerit;</p></div>
+
+<div  type="textpart" subtype="section" xml:base="urn:cts:latinLit:phi0448.phi001.perseus-lat2:1.3" n="4">
+<p>itemque Dumnorigi Haeduo, fratri Diviciaci, qui eo tempore principatum in civitate obtinebat ac maxime plebi acceptus erat, ut idem conaretur persuadet eique filiam suam in matrimonium dat.</p>
+</div></div></div></div></body></text></TEI>

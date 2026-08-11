@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Homer, Iliad — urn:cts:greekLit:tlg0012.tlg001.perseus-grc2
+  Excerpt trimmed for testing. Licensed CC BY-SA 4.0; see ATTRIBUTION.md.
+-->
+<?xml-model href="https://epidoc.stoa.org/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title xml:lang="grc">Ἰλιάς</title>
+                <author>Homer</author>
+                <editor>David B. Monro</editor>
+                <editor>Thomas W. Allen</editor>
+                <sponsor>Perseus Project, Tufts University</sponsor>
+                <principal>Gregory Crane</principal>
+                <respStmt>
+                    <resp>Prepared under the supervision of</resp>
+                    <name>Lisa Cerrato</name>
+                    <name>William Merrill</name>
+                    <name>Elli Mylonas</name>
+                    <name>David Smith</name>
+                </respStmt>
+                <funder n="org:AnnCPB">The Annenberg CPB/Project</funder>
+            </titleStmt>
+            <extent>about 500Kb</extent>
+            <publicationStmt>
+                <publisher>Trustees of Tufts University</publisher>
+                <pubPlace>Medford, MA</pubPlace>
+                <authority>Perseus Project</authority>
+            </publicationStmt>
+            <notesStmt>
+                <note anchored="true" place="unspecified">Basic SGML tagging by Lauren Burka and
+                    Chiara Thayer.</note>
+            </notesStmt>
+            <sourceDesc>
+                <biblStruct>
+                    <monogr>
+                        <author>Homer</author>
+                        <title xml:lang="lat">Homeri Opera</title>
+                        <editor>David B. Monro</editor>
+                        <editor>Thomas W. Allen</editor>
+                        <edition xml:lang="lat">Editio Tertia</edition>
+                        <imprint>
+                            <pubPlace>Oxford</pubPlace>
+                            <publisher>Clarendon Press</publisher>
+                            <date>1908-1920</date>
+                        </imprint>
+                        <biblScope unit="volume">1-2</biblScope>
+                    </monogr>
+                    <series>
+                        <title>Scriptorum classicorum bibliotheca Oxoniensis</title>
+                    </series>
+                    <ref target="https://archive.org/details/homerioperarecog01homeuoft">Internet
+                        Archive</ref>
+                    <ref target="https://archive.org/details/homerioperarecog02homeuoft">Internet
+                        Archive</ref>
+                </biblStruct>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <refsDecl n="CTS">
+                <cRefPattern n="line" matchPattern="(\w+).(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']//tei:l[@n='$2'])">
+                    <p>This pointer pattern extracts Book and Line</p>
+                </cRefPattern>
+                <cRefPattern n="book" matchPattern="(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+                    <p>This pointer pattern extracts Book</p>
+                </cRefPattern>
+            </refsDecl>
+            <refsDecl>
+                <refState delim="." unit="book"/>
+                <refState unit="line"/>
+            </refsDecl>
+            <editorialDecl>
+                <quotation marks="none"/>
+            </editorialDecl>
+            
+        </encodingDesc>
+        <profileDesc>
+            <langUsage>
+                <language ident="grc">Greek</language>
+                <language ident="eng">English</language>
+            </langUsage>
+        </profileDesc>
+        <revisionDesc>
+            <change who="Lisa Cerrato" when="2016-09-20">added missing info in header; reviewed quotes</change>
+            <change who="Gregory Crane" when="2016-09-19">reviewed and fixed quote tags</change>
+            <change who="Bridget Almas" when="2014-07-18T00:00:00Z">Derived EpiDoc version from
+                urn:cts:greekLit:tlg0012.tlg001.perseus-grc1</change>
+            <change who="Nancy Sultan" when="1990-10-01">Put in card breaks.</change>
+            <change who="EM" when="1991-08-01">Revise DTDs and recheck texts.</change>
+<change who="GRC" when="2018-06-25">11.1: replaced ἠὼς with Ἠὼς</change>
+        </revisionDesc>
+    </teiHeader>
+    <text xml:lang="grc">
+        <body>
+            <div type="edition" n="urn:cts:greekLit:tlg0012.tlg001.perseus-grc2" xml:lang="grc">
+                <div type="textpart" subtype="Book" n="1">
+                    <milestone ed="p" n="1" unit="card"/>
+                    <l n="1">
+                        <milestone ed="P" unit="para"/>μῆνιν ἄειδε θεὰ Πηληϊάδεω Ἀχιλῆος</l>
+                    <l n="2">οὐλομένην, ἣ μυρίʼ Ἀχαιοῖς ἄλγεʼ ἔθηκε,</l>
+                    <l n="3">πολλὰς δʼ ἰφθίμους ψυχὰς Ἄϊδι προΐαψεν</l>
+                    <l n="4">ἡρώων, αὐτοὺς δὲ ἑλώρια τεῦχε κύνεσσιν</l>
+                    <l n="5">οἰωνοῖσί τε πᾶσι, Διὸς δʼ ἐτελείετο βουλή,</l>
+                    <l n="6">ἐξ οὗ δὴ τὰ πρῶτα διαστήτην ἐρίσαντε</l>
+                    <l n="7">Ἀτρεΐδης τε ἄναξ ἀνδρῶν καὶ δῖος Ἀχιλλεύς.</l>
+                    <l n="8">
+                        <milestone ed="P" unit="Para"/>τίς τʼ ἄρ σφωε θεῶν ἔριδι ξυνέηκε μάχεσθαι;</l>
+                    <l n="9">Λητοῦς καὶ Διὸς υἱός· ὃ γὰρ βασιλῆϊ χολωθεὶς</l>
+                    <l n="10">νοῦσον ἀνὰ στρατὸν ὄρσε κακήν, ὀλέκοντο δὲ λαοί,</l>
+                    <l n="11">οὕνεκα τὸν Χρύσην ἠτίμασεν ἀρητῆρα</l>
+                    <l n="12">Ἀτρεΐδης· ὃ γὰρ ἦλθε θοὰς ἐπὶ νῆας Ἀχαιῶν</l>
+                    <l n="13">λυσόμενός τε θύγατρα φέρων τʼ ἀπερείσιʼ ἄποινα,</l>
+                    <l n="14">στέμματʼ ἔχων ἐν χερσὶν ἑκηβόλου Ἀπόλλωνος</l>
+                    <l n="15">χρυσέῳ ἀνὰ σκήπτρῳ, καὶ λίσσετο πάντας Ἀχαιούς,</l>
+                    <l n="16">Ἀτρεΐδα δὲ μάλιστα δύω, κοσμήτορε λαῶν·</l>
+                 <q>  <l n="17">Ἀτρεΐδαι τε καὶ ἄλλοι ἐϋκνήμιδες Ἀχαιοί,</l>
+                    <l n="18">ὑμῖν μὲν θεοὶ δοῖεν Ὀλύμπια δώματʼ ἔχοντες</l>
+                    <l n="19">ἐκπέρσαι Πριάμοιο πόλιν, εὖ δʼ οἴκαδʼ ἱκέσθαι·</l>
+                    <l n="20">παῖδα δʼ ἐμοὶ λύσαιτε φίλην, τὰ δʼ ἄποινα δέχεσθαι,</l>
+                    <l n="21">ἁζόμενοι Διὸς υἱὸν ἑκηβόλον Ἀπόλλωνα.</l>
+                 </q>
+                    <l n="22">
+                        <milestone ed="P" unit="para"/>ἔνθʼ ἄλλοι μὲν πάντες ἐπευφήμησαν Ἀχαιοὶ</l>
+                    <l n="23">αἰδεῖσθαί θʼ ἱερῆα καὶ ἀγλαὰ δέχθαι ἄποινα·</l>
+                    <l n="24">ἀλλʼ οὐκ Ἀτρεΐδῃ Ἀγαμέμνονι ἥνδανε θυμῷ,</l>
+                    <l n="25">ἀλλὰ κακῶς ἀφίει, κρατερὸν δʼ ἐπὶ μῦθον ἔτελλε·</l>
+                    <q>
+                        <l n="26">μή σε γέρον κοίλῃσιν ἐγὼ παρὰ νηυσὶ κιχείω</l>
+                        <l n="27">ἢ νῦν δηθύνοντʼ ἢ ὕστερον αὖτις ἰόντα,</l>
+                        <l n="28">μή νύ τοι οὐ χραίσμῃ σκῆπτρον καὶ στέμμα θεοῖο·</l>
+                        <l n="29">τὴν δʼ ἐγὼ οὐ λύσω· πρίν μιν καὶ γῆρας ἔπεισιν</l>
+                        <l n="30">ἡμετέρῳ ἐνὶ οἴκῳ ἐν Ἄργεϊ τηλόθι πάτρης</l>
+                        <l n="31">ἱστὸν ἐποιχομένην καὶ ἐμὸν λέχος ἀντιόωσαν·</l>
+                        <l n="32">ἀλλʼ ἴθι μή μʼ ἐρέθιζε σαώτερος ὥς κε νέηαι.</l>
+                    </q>
+                    <milestone ed="p" n="33" unit="card"/>
+                    <l n="33">
+                        <milestone ed="P" unit="para"/>ὣς ἔφατʼ, ἔδεισεν δʼ ὃ γέρων καὶ ἐπείθετο μύθῳ·</l>
+                    <l n="34">βῆ δʼ ἀκέων παρὰ θῖνα πολυφλοίσβοιο θαλάσσης·</l>
+                    <l n="35">πολλὰ δʼ ἔπειτʼ ἀπάνευθε κιὼν ἠρᾶθʼ ὁ γεραιὸς</l>
+                    <l n="36">Ἀπόλλωνι ἄνακτι, τὸν ἠΰκομος τέκε Λητώ·</l>
+                    <q>
+                        <l n="37">κλῦθί μευ ἀργυρότοξʼ, ὃς Χρύσην ἀμφιβέβηκας</l>
+                        <l n="38">Κίλλαν τε ζαθέην Τενέδοιό τε ἶφι ἀνάσσεις,</l>
+                        <l n="39">Σμινθεῦ εἴ ποτέ τοι χαρίεντʼ ἐπὶ νηὸν ἔρεψα,</l>
+                        <l n="40">ἢ εἰ δή ποτέ τοι κατὰ πίονα μηρίʼ ἔκηα</l>
+</q></div></div></body></text></TEI>

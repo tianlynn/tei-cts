@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Homer, Odyssey — urn:cts:greekLit:tlg0012.tlg002.perseus-grc2
+  Excerpt trimmed for testing. Licensed CC BY-SA 4.0; see ATTRIBUTION.md.
+-->
+<?xml-model href="https://epidoc.stoa.org/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title xml:lang="grc">Ὀδύσσεια</title>
+            <author>Homer</author>
+            <editor>Augustus Taber Murray</editor>
+            <sponsor>Perseus Project, Tufts University</sponsor>
+            <principal>Gregory Crane</principal>
+            <respStmt>
+               <resp>Prepared under the supervision of</resp>
+               <name>Lisa Cerrato</name>
+               <name>William Merrill</name>
+               <name>Elli Mylonas</name>
+               <name>David Smith</name>
+            </respStmt>
+            <funder n="org:AnnCPB">The Annenberg CPB/Project</funder>
+         </titleStmt>
+         <extent>about 419Kb</extent>
+         <publicationStmt>
+            <publisher>Trustees of Tufts University</publisher>
+            <pubPlace>Medford, MA</pubPlace>
+            <authority>Perseus Project</authority>
+         </publicationStmt>
+         <notesStmt>
+            <note anchored="true" place="unspecified">Text scanned at U. Chicago in 1989. Basic SGML
+               tagging by Lauren Burka and Chiara Thayer.</note>
+         </notesStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <author>Homer</author>
+                  <title>The Odyssey</title>
+                  <title type="sub">with an English Translation</title>
+                  <editor>A. T. Murray</editor>
+                  <imprint>
+                     <pubPlace>London</pubPlace>
+                     <publisher>William Heinemann, Ltd.</publisher>
+                     <pubPlace>New York</pubPlace>
+                     <publisher>G.P. Putnam's Sons</publisher>
+                     <date>1919</date>
+                  </imprint>
+                  <biblScope unit="volume">1-2</biblScope>
+               </monogr>
+               <series>
+                  <title>Loeb Classical Library</title>                        
+               </series>
+               <ref target="http://www.archive.org/details/odysseymurray01homeuoft">Internet Archive</ref><!-- Volume 1 -->
+               <ref target="http://hdl.handle.net/2027/uc1.$b318748">HathiTrust</ref><!-- Volume 2 -->
+            </biblStruct>           
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <refsDecl n="CTS">
+            <cRefPattern n="line" matchPattern="(\w+).(\w+)"
+               replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']//tei:l[@n='$2'])">
+               <p>This pointer pattern extracts Book and Line</p>
+            </cRefPattern>
+            <cRefPattern n="book" matchPattern="(\w+)"
+               replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+               <p>This pointer pattern extracts Book</p>
+            </cRefPattern>
+         </refsDecl>
+         <refsDecl>
+            <refState delim="." unit="book"/>
+            <refState unit="card"/>
+         </refsDecl>
+         <refsDecl>
+            <refState unit="book" delim="."/>
+            <refState unit="line"/>
+         </refsDecl>
+      </encodingDesc>
+      <profileDesc>
+         <langUsage>
+            <language ident="grc">Greek</language>
+            <language ident="eng">English</language>
+         </langUsage>
+      </profileDesc>
+      <revisionDesc>
+         <change when="19901001" who="Nancy Sultan">Put in card breaks.</change>
+         <change when="19910801" who="EM">Revise DTDs and recheck texts.</change>
+         <change when="20151216" who="Bridget Almas">Converted to EpiDoc</change>
+         <change when="20151216" who="Bridget Almas">Bumped URN</change>
+         <change when="2016-02-10" who="Lisa Cerrato">numerous typos</change>
+      </revisionDesc>
+   </teiHeader>
+   </TEI>

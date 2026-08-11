@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Herodotus, Histories — urn:cts:greekLit:tlg0016.tlg001.perseus-grc2
+  Excerpt trimmed for testing. Licensed CC BY-SA 4.0; see ATTRIBUTION.md.
+-->
+<?xml-model href="https://epidoc.stoa.org/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI  xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="eng">
+      <fileDesc>
+         <titleStmt>
+            <title xml:lang="grc">Ἱστορίαι</title>    
+            <author>Herodotus</author>
+            <editor>A.D. Godley</editor>
+            <sponsor>Perseus Project, Tufts University</sponsor>
+            <principal>Gregory Crane</principal>
+            <respStmt>
+               <resp>Prepared under the supervision of</resp>
+               <name>Lisa Cerrato</name>
+               <name>William Merrill</name>
+               <name>Elli Mylonas</name>
+               <name>David Smith</name>
+            </respStmt>
+            <funder n="org:AnnCPB">The Annenberg CPB/Project</funder>
+         </titleStmt>
+         <extent>about 258Kb</extent>
+         <publicationStmt>
+            <publisher>Trustees of Tufts University</publisher>
+            <pubPlace>Medford, MA</pubPlace>
+            <authority>Perseus Project</authority>
+         </publicationStmt>
+         <notesStmt>
+            <note anchored="true" place="unspecified">Text scanned at U. Chicago in 1988-9.  Basic tagging
+	done by EM, Scott Ettinger, Roger Travis.</note>
+         </notesStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <title>Herodotus</title>
+                  <editor>A.D. Godley</editor>
+                  <imprint>
+                     <pubPlace>Cambridge</pubPlace>
+                     <pubPlace>London</pubPlace>
+                     <publisher>Harvard University Press</publisher>
+                     <publisher>William Heinemann Ltd.</publisher>
+                     <date type="printing">1920-1925</date>
+                  </imprint>
+               </monogr>
+               <series>
+                  <title>Loeb Classical Library</title>
+               </series>               
+               <ref target="https://archive.org/details/historiesvolumei00hero_249/page/n5/mode/2up">The Internet Archive</ref><!-- Volume 1 -->
+               <ref target="https://archive.org/details/historiesvolumei00hero_114/page/n8/mode/2up">The Internet Archive</ref><!-- Volume 2 -->
+               <ref target="https://archive.org/details/historiesvolumei00hero_574/page/n10/mode/2up">The Internet Archive</ref><!-- Volume 3 -->
+               <ref target="https://archive.org/details/historiesvolumei00hero/page/n8/mode/2up">The Internet Archive</ref><!-- Volume 4 -->
+              </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <refsDecl n="CTS">
+            <cRefPattern n="section" matchPattern="(\w+).(\w+).(\w+)"
+                         replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2']/tei:div[@n='$3'])">
+                <p>This pointer pattern extracts Book and Chapter and Section</p>
+            </cRefPattern>
+            <cRefPattern n="chapter" matchPattern="(\w+).(\w+)"
+               replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']/tei:div[@n='$2'])">
+                <p>This pointer pattern extracts Book and Chapter</p>
+            </cRefPattern>
+            <cRefPattern n="book" matchPattern="(\w+)"
+               replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+                <p>This pointer pattern extracts Book</p>
+            </cRefPattern>
+        </refsDecl>
+      </encodingDesc>
+      <profileDesc>
+         <creation>
+            <date from="-0450" to="-0425">5 c. B.C.</date>
+         </creation>
+         <langUsage>
+            <language ident="grc" usage="100">Greek
+	</language>
+            <language ident="eng">English
+      </language>
+         </langUsage>
+         <textClass/>
+      </profileDesc>
+      <revisionDesc>
+         <change when="19910801" who="EM">Revise DTDs and recheck texts.</change>
+         <change when="19920501" who="David Smith">Fixed capitalized words that had no accents and/or breathings. See the text log for an itemized list</change>
+         <change when="20151222" who="Bridget Almas">Converted to EpiDoc</change>
+         <change when="20151222" who="Bridget Almas">Bumped URN</change>
+         <change when="20180618" who="Gregory Crane">removed duplicated ἐκ in 7.26</change>
+         <change when="20220228" who="Alison Babeu">Updated bibliographic metadata</change>
+      </revisionDesc>
+   </teiHeader>
+   <text>
+      <body>
+         <div n="urn:cts:greekLit:tlg0016.tlg001.perseus-grc2" type="edition" xml:lang="grc">
+         <div type="textpart" subtype="book" n="1">
+            <div type="textpart" subtype="chapter" n="1">
+               <div type="textpart" subtype="section" n="0">
+                  <p rend="indent">Ἡροδότου Ἁλικαρνησσέος ἱστορίης ἀπόδεξις ἥδε, ὡς μήτε τὰ γενόμενα ἐξ ἀνθρώπων τῷ χρόνῳ ἐξίτηλα γένηται, μήτε ἔργα μεγάλα τε καὶ θωμαστά, τὰ μὲν Ἕλλησι τὰ δὲ βαρβάροισι ἀποδεχθέντα, ἀκλεᾶ γένηται, τά τε ἄλλα καὶ διʼ ἣν αἰτίην ἐπολέμησαν ἀλλήλοισι.</p>
+               </div>
+               <div type="textpart" subtype="section" n="1">
+                  <p rend="indent">Περσέων μέν νυν οἱ λόγιοι Φοίνικας αἰτίους φασὶ γενέσθαι τῆς διαφορῆς.  τούτους γὰρ ἀπὸ τῆς Ἐρυθρῆς καλεομένης θαλάσσης ἀπικομένους ἐπὶ τήνδε τὴν θάλασσαν, καὶ οἰκήσαντας τοῦτον τὸν χῶρον τὸν καὶ νῦν οἰκέουσι, αὐτίκα ναυτιλίῃσι μακρῇσι ἐπιθέσθαι, ἀπαγινέοντας δὲ φορτία Αἰγύπτιά τε καὶ Ἀσσύρια τῇ τε ἄλλῃ ἐσαπικνέεσθαι καὶ δὴ καὶ ἐς Ἄργος.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="2">
+                  <p>
+τὸ δὲ Ἄργος τοῦτον τὸν χρόνον προεῖχε ἅπασι τῶν ἐν τῇ νῦν Ἑλλάδι καλεομένῃ χωρῇ.  ἀπικομένους δὲ τούς Φοίνικας ἐς δὴ τὸ Ἄργος τοῦτο διατίθεσθαι τὸν φόρτον.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="3">
+                  <p>
+πέμπτῃ δὲ ἢ ἕκτῃ ἡμέρῃ ἀπʼ ἧς ἀπίκοντο, ἐξεμπολημένων σφι σχεδόν πάντων, ἐλθεῖν ἐπὶ τὴν θάλασσαν γυναῖκας ἄλλας τε πολλάς καὶ δὴ καὶ τοῦ βασιλέος θυγατέρα· τὸ δέ οἱ οὔνομα εἶναι, κατὰ τὠυτὸ τὸ καὶ Ἕλληνές λέγουσι, Ἰοῦν τὴν  Ἰνάχου·
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="4">
+                  <p>
+ταύτας στάσας κατά πρύμνην τῆς νεὸς ὠνέεσθαι τῶν φορτίων τῶν σφι ἦν θυμός μάλιστα· καὶ τοὺς Φοίνικας διακελευσαμένους ὁρμῆσαι ἐπʼ αὐτάς.  τὰς μὲν δὴ πλεῦνας τῶν γυναικῶν ἀποφυγεῖν, τὴν δὲ Ἰοῦν σὺν ἄλλῃσι ἁρπασθῆναι. ἐσβαλομένους δὲ ἐς τὴν νέα οἴχεσθαι ἀποπλέοντας ἐπʼ Αἰγύπτου.
+
+</p>
+               </div>
+            </div>
+            <div type="textpart" subtype="chapter" n="2">
+               <div type="textpart" subtype="section" n="1">
+                  <p rend="indent">οὕτω μὲν Ἰοῦν ἐς Αἴγυπτον ἀπικέσθαι λέγουσι Πέρσαι, οὐκ ὡς Ἕλληνές, καὶ τῶν ἀδικημάτων πρῶτον τοῦτο ἄρξαι.  μετὰ δὲ ταῦτα Ἑλλήνων τινάς (οὐ γὰρ ἔχουσι τοὔνομα ἀπηγήσασθαι) φασὶ τῆς Φοινίκης ἐς Τύρον προσσχόντας ἁρπάσαι τοῦ βασιλέος τὴν θυγατέρα Εὐρώπην.  εἴησαν δʼ ἄν οὗτοι Κρῆτες.  ταῦτα μὲν δὴ ἴσα πρὸς ἴσα σφι γενέσθαι, μετὰ δὲ ταῦτα Ἕλληνας αἰτίους τῆς δευτέρης ἀδικίης γενέσθαι·
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="2">
+                  <p>
+καταπλώσαντας γὰρ μακρῇ νηί ἐς Αἶαν τε τὴν Κολχίδα καὶ ἐπὶ Φᾶσιν ποταμόν, ἐνθεῦτεν, διαπρηξαμένους καὶ τἄλλα τῶν εἵνεκεν ἀπίκατο, ἁρπάσαι τοῦ βασιλέος τὴν θυγατέρα Μηδείην.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="3">
+                  <p>
+πέμψαντά δὲ τὸν Κόλχων βασιλέα ἐς τὴν Ἑλλάδα κήρυκα αἰτέειν τε δίκας τῆς ἁρπαγῆς καὶ ἀπαιτέειν τὴν θυγατέρα.  τοὺς δὲ ὑποκρίνασθαι ὡς οὐδὲ ἐκεῖνοι Ἰοῦς τῆς Ἀργείης ἔδοσάν σφι δίκας τῆς ἁρπαγῆς· οὐδὲ ὦν αὐτοὶ δώσειν ἐκείνοισι.
+
+</p>
+               </div>
+            </div>
+            <div type="textpart" subtype="chapter" n="3">
+               <div type="textpart" subtype="section" n="1">
+                  <p rend="indent">δευτέρῃ δὲ λέγουσι γενεῇ μετὰ ταῦτα Ἀλέξανδρον τὸν Πριάμου, ἀκηκοότα ταῦτα, ἐθελῆσαί οἱ ἐκ τῆς Ἑλλάδος διʼ ἁρπαγῆς γενέσθαι γυναῖκα, ἐπιστάμενον πάντως ὅτι οὐ δώσει δίκας. οὐδὲ γὰρ ἐκείνους διδόναι.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="2">
+                  <p>
+οὕτω δὴ ἁρπάσαντος αὐτοῦ Ἑλένην, τοῖσι Ἕλλησι δόξαι  πρῶτὸν πέμψαντας ἀγγέλους ἀπαιτέειν τε Ἑλένην καὶ δίκας τῆς ἁρπαγῆς αἰτέειν. τοὺς δέ, προϊσχομένων ταῦτα, προφέρειν σφι Μηδείης τὴν ἁρπαγήν, ὡς οὐ δόντες αὐτοὶ δίκας οὐδὲ ἐκδόντες ἀπαιτεόντων βουλοίατό σφι παρʼ ἄλλων δίκας γίνεσθαι.
+
+</p>
+               </div>
+            </div>
+            <div type="textpart" subtype="chapter" n="4">
+               <div type="textpart" subtype="section" n="1">
+                  <p rend="indent">μέχρι μὲν ὦν τούτου ἁρπαγάς μούνας εἶναι παρʼ ἀλλήλων, τὸ δὲ ἀπὸ τούτου Ἕλληνας δὴ μεγάλως αἰτίους γενέσθαι· προτέρους γὰρ ἄρξαι στρατεύεσθαι ἐς τὴν Ἀσίην ἢ σφέας ἐς τὴν Εὐρώπην.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="2">
+                  <p>
+τὸ μέν νυν ἁρπάζειν γυναῖκας ἀνδρῶν ἀδίκων νομίζειν ἔργον εἶναι, τὸ δὲ ἁρπασθεισέων σπουδήν ποιήσασθαι τιμωρέειν ἀνοήτων, τὸ δὲ μηδεμίαν ὤρην ἔχειν ἁρπασθεισέων σωφρόνων· δῆλα γὰρ δὴ ὅτι, εἰ μὴ αὐταὶ ἐβούλοντο, οὐκ ἂν ἡρπάζοντο.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="3">
+                  <p>
+σφέας μὲν δὴ τοὺς ἐκ τῆς Ἀσίης λέγουσι Πέρσαι ἁρπαζομενέων τῶν γυναικῶν λόγον οὐδένα ποιήσασθαι, Ἕλληνας δὲ Λακεδαιμονίης εἵνεκεν γυναικὸς στόλον μέγαν συναγεῖραι καὶ ἔπειτα ἐλθόντας ἐς τὴν Ἀσίην τὴν Πριάμου δύναμιν κατελεῖν.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="4">
+                  <p>
+ἀπὸ τούτου αἰεὶ ἡγήσασθαι τὸ Ἑλληνικὸν σφίσι εἶναι πολέμιον.  τὴν γὰρ Ἀσίην καὶ τὰ ἐνοικέοντα ἔθνεα βάρβαρα <note anchored="true" resp="ed" place="unspecified">1</note> οἰκηιεῦνται οἱ Πέρσαι, τὴν δὲ Εὐρώπην καὶ τὸ Ἑλληνικόν ἥγηνται κεχωρίσθαι.
+
+</p>
+               </div>
+            </div>
+            <div type="textpart" subtype="chapter" n="5">
+               <div type="textpart" subtype="section" n="1">
+                  <p rend="indent">οὕτω μὲν  Πέρσαι λέγουσι γενέσθαι, καὶ διὰ τὴν Ἰλίου ἅλωσιν εὑρίσκουσι σφίσι ἐοῦσαν τὴν ἀρχήν τῆς ἔχθρης τῆς ἐς τοὺς Ἕλληνας.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="2">
+                  <p>
+περὶ δὲ τῆς Ἰοῦς οὐκ ὁμολογέουσι Πέρσῃσι οὕτω Φοίνικες· οὐ γὰρ ἁρπαγῇ σφέας χρησαμένους λέγουσι ἀγαγεῖν αὐτήν ἐς Αἴγυπτον, ἀλλʼ ὡς ἐν τῷ  Ἄργεϊ ἐμίσγετο τῷ ναυκλήρῳ τῆς νέος· ἐπεὶ δʼ ἔμαθε ἔγκυος ἐοῦσα, αἰδεομένη τοὺς τοκέας οὕτω δὴ ἐθελοντήν αὐτήν τοῖσι Φοίνιξι συνεκπλῶσαι, ὡς ἂν μὴ κατάδηλος γένηται.
+</p>
+               </div>
+               <div type="textpart" subtype="section" n="3">
+                  <p rend="indent">ταῦτα μέν νυν Πέρσαι τε καὶ Φοίνικες λέγουσι· ἐγὼ δὲ περὶ μὲν τούτων οὐκ ἔρχομαι ἐρέων ὡς οὕτω ἢ ἄλλως κως ταῦτα ἐγένετο, τὸν δὲ οἶδα αὐτὸς πρῶτον ὑπάρξαντα ἀδίκων ἔργων ἐς τοὺς Ἕλληνας, τοῦτον σημήνας προβήσομαι ἐς τὸ πρόσω τοῦ λόγου, ὁμοίως σμικρὰ καὶ μεγάλα ἄστεα ἀνθρώπων ἐπεξιών.
+</p>
+</div></div></div></div></body></text></TEI>

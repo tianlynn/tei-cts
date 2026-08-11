@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sophocles, Oedipus Tyrannus — urn:cts:greekLit:tlg0011.tlg004.perseus-grc2
+  Excerpt trimmed for testing. Licensed CC BY-SA 4.0; see ATTRIBUTION.md.
+-->
+<?xml-model href="https://epidoc.stoa.org/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader xml:lang="eng">
+      <fileDesc>
+         <titleStmt>
+            <title xml:lang="grc">Οἰδίπους Τύραννος</title>            
+            <author>Sophocles</author>
+            <editor >Francis Storr</editor>
+            <sponsor>Perseus Project, Tufts University</sponsor>
+            <principal>Gregory Crane</principal>
+            <respStmt>
+               <resp>Prepared under the supervision of</resp>
+               <name>Lisa Cerrato</name>
+               <name>William Merrill</name>
+               <name>Elli Mylonas</name>
+               <name>David Smith</name>
+            </respStmt>
+            <funder n="org:AnnCPB">The Annenberg CPB/Project</funder>
+         </titleStmt>
+         <extent>About 105Kb</extent>
+         <publicationStmt>
+            <publisher>Trustees of Tufts University</publisher>
+            <pubPlace>Medford, MA</pubPlace>
+            <authority>Perseus Project</authority>
+         </publicationStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <author>Sophocles</author>
+                  <title>Sophocles</title>
+                  <title type="sub">Oedipus the king. Oedipus at Colonus. Antigone</title>
+                  <editor>Francis Storr</editor>
+                  <imprint>
+                     <pubPlace>London</pubPlace>
+                     <pubPlace>New York</pubPlace>
+                     <publisher>William Heinemann Ltd.</publisher>
+                     <publisher>The Macmillan Company</publisher>
+                     <date>1912</date>
+                  </imprint>
+                  <biblScope unit="volume">1</biblScope>
+               </monogr>
+               <series>
+                  <title>The Loeb classical library</title>
+               </series>
+               <ref target="https://archive.org/details/sophoclesstor01sophuoft/page/6/mode/2up">Internet Archive</ref>
+            </biblStruct>
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <refsDecl n="CTS">
+            <cRefPattern n="line" matchPattern="(.+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div//tei:l[@n='$1'])">
+               <p>This pointer pattern extracts line</p>
+            </cRefPattern>
+</refsDecl>
+         
+         <!--<refsDecl n="CTS">
+            
+            <cRefPattern n="card" matchPattern="(\w+)" replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+               <p>This pointer pattern extracts cards</p>
+            </cRefPattern>
+ </refsDecl>-->
+      </encodingDesc>
+      <profileDesc>
+         <langUsage>
+            <language ident="grc">Greek</language>
+         </langUsage>
+      </profileDesc>
+      <revisionDesc>
+         <change when="2017-02-06" who="Lisa Cerrato">restructing to lines; minor cleanup such as change log.</change>
+         <change when="2016-01-15" who="TDBuck">p4 to p5</change>
+         <change when="2013-09-13" who="balmas01">moving Greg's work-in-progress on CTS-izing greco-roman collection texts to a Work directory</change>
+         <change when="2013-06-13" who="gcrane">tagging now should be compatible with CTS</change>
+         <change when="2012-11-20" who="ajones06">Changed the bibliographic information in the headers to reflect Francesco's discovery that the Greek text for these files was taken from the two-volume public domain Loeb version edited by Francis Storr.</change> 
+         <change when="2011-09-07" who="rsingh04">adding rend=displayNum to lb tags</change>
+         <change when="2011-08-02" who="lcerrato">removed duplicate word on line 1478</change>
+         <change when="2010-12-25" who="gcrane">LB milestones instead of L tags</change>
+         <change when="2010-12-24" who="gcrane">ADD tags for lt/gt entities DEL tags for lsqb/rsqb entities</change>
+         <change when="2010-12-24" who="gcrane">base files for SDL</change>
+         <change when="2009-12-08" who="rsingh04">moved more xml files around based on copyright status</change>
+         <change when="2005-08-01" who="packel">removed stray item tags</change>
+         <change when="2005-07-25" who="packel">Converted to XML</change>
+         <change when="2004-06-14" who="lcerrato">changed speaker at lines 1071-2 to Jocasta, as confirmed by source</change>
+          <change when="2004-04-21" who="mimno">added card 1s</change>
+         <change when="2003-07-01" who="yorkc">Updated texts to TEI P4 and Perseus P4 extensions; minor cleanup (esp. character encodings and typos.)</change>
+          <change when="2003-05-21" who="lcerrato">added missing speaker at 1158: confirmed with source</change>
+          <change when="2000-03-22" who="amahoney">remove stray punctuation in author field, for biblio display</change>
+          <change when="2000-03-04" who="dasmith">Added separate funder entity to TEI header.</change>
+          <change when="2000-02-15" who="amahoney">use n attribute on sp element to carry over the speaker name when the speech is interrupted by a card break;  this also requires that the card break at the end come after the close of the sp, not within</change>
+         <change when="1999-11-24" who="amahoney">Bring remaining files up to new DTD;  use part=i and part=f for antilabe in all files</change>
+         <change when="1999-11-08" who="amahoney">use entities from the ISO diacriticals set as a first approximation to metrical symbols;  the old DTD had some, but the new one doesn't yet.</change>
+         <change when="1999-11-05" who="amahoney">convert to TEI P3</change>
+         <change when="1999-11-05" who="Anne Mahoney">Markup</change>
+         <change when="1991-08-01" who="Bill Merrill">Check text against TLG Sophocles in order to discover if there are any missing whole words or lines.</change>
+         <change when="1991-08-01" who="EM">Revise DTDs and recheck texts.</change>
+         <change when="1990-09-19" who="EM">Final check of cardbreaks, tags, and linenumbers.</change>
+         <change when="1988" who="EM, Scott Ettinger and Roger Travis">Text scanned at U. Chicago in 1988. Basic SGML tagging by EM, Scott Ettinger and Roger Travis.</change>
+      </revisionDesc>
+   </teiHeader>
+   
+   <text xml:lang="grc">
+      <body>
+         <div type="edition" n="urn:cts:greekLit:tlg0011.tlg004.perseus-grc2" xml:lang="grc">
+        <milestone unit="card" resp="p" n="1"/>
+         <div type="textpart" subtype="episode">
+            <sp>
+               <speaker>Οἰδίπους</speaker>
+               <l n="1">ὦ τέκνα, Κάδμου τοῦ πάλαι νέα τροφή,</l>
+               <l n="2">τίνας ποθʼ ἕδρας τάσδε μοι θοάζετε</l>
+               <l n="3">ἱκτηρίοις κλάδοισιν ἐξεστεμμένοι;</l>
+               <l n="4">πόλις δʼ ὁμοῦ μὲν θυμιαμάτων γέμει,</l>
+               <l n="5">ὁμοῦ δὲ παιάνων τε καὶ στεναγμάτων·</l>
+               <l n="6">ἁγὼ δικαιῶν μὴ παρʼ ἀγγέλων, τέκνα,</l>
+               <l n="7">ἄλλων ἀκούειν αὐτὸς ὧδʼ ἐλήλυθα,</l>
+               <l n="8">ὁ πᾶσι κλεινὸς Οἰδίπους καλούμενος.</l>
+               <l n="9">ἀλλʼ ὦ γεραιέ, φράζʼ, ἐπεὶ πρέπων ἔφυς</l>
+               <l n="10">πρὸ τῶνδε φωνεῖν, τίνι τρόπῳ καθέστατε,</l>
+               <l n="11">δείσαντες ἢ στέρξαντες; ὡς θέλοντος ἂν</l>
+               <l n="12">ἐμοῦ προσαρκεῖν πᾶν·  δυσάλγητος γὰρ ἂν</l>
+               <l n="13">εἴην τοιάνδε μὴ οὐ κατοικτίρων ἕδραν.</l>
+            </sp>
+            <milestone unit="card" resp="p" n="14"/>
+            <sp>
+               <speaker>Ἱερεύς</speaker>
+               <l n="14">ἀλλʼ ὦ κρατύνων Οἰδίπους χώρας ἐμῆς,</l>
+               <l n="15">ὁρᾷς μὲν ἡμᾶς ἡλίκοι προσήμεθα</l>
+               <l n="16">βωμοῖσι τοῖς σοῖς·  οἱ μὲν οὐδέπω μακρὰν</l>
+               <l n="17">πτέσθαι σθένοντες, οἱ δὲ σὺν γήρᾳ βαρεῖς,</l>
+               <l n="18">ἱερῆς, ἐγὼ μὲν Ζηνός, οἵδε τʼ ᾐθέων</l>
+               <l n="19">λεκτοί·  τὸ δʼ ἄλλο φῦλον ἐξεστεμμένον</l>
+               <l n="20">ἀγοραῖσι θακεῖ πρός τε Παλλάδος διπλοῖς</l>
+               <l n="21">ναοῖς, ἐπʼ Ἰσμηνοῦ τε μαντείᾳ σποδῷ.</l>
+               <l n="22">πόλις γάρ, ὥσπερ καὐτὸς εἰσορᾷς, ἄγαν</l>
+               <l n="23">ἤδη σαλεύει κἀνακουφίσαι κάρα</l>
+               <l n="24">βυθῶν ἔτʼ οὐχ οἵα τε φοινίου σάλου,</l>
+               <l n="25">φθίνουσα μὲν κάλυξιν ἐγκάρποις χθονός,</l>
+               <l n="26">φθίνουσα δʼ ἀγέλαις βουνόμοις τόκοισί τε</l>
+               <l n="27">ἀγόνοις γυναικῶν·  ἐν δʼ ὁ πυρφόρος θεὸς</l>
+               <l n="28">σκήψας ἐλαύνει, λοιμὸς ἔχθιστος, πόλιν,</l>
+               <l n="29">ὑφʼ οὗ κενοῦται δῶμα Καδμεῖον, μέλας δʼ</l>
+               <l n="30">Ἅιδης στεναγμοῖς καὶ γόοις πλουτίζεται.</l>
+               <l n="31">θεοῖσι μέν νυν οὐκ ἰσούμενόν σʼ ἐγὼ</l>
+               <l n="32">οὐδʼ οἵδε παῖδες ἑζόμεσθʼ ἐφέστιοι,</l>
+               <l n="33">ἀνδρῶν δὲ πρῶτον ἔν τε συμφοραῖς βίου</l>
+               <l n="34">κρίνοντες ἔν τε δαιμόνων συναλλαγαῖς·</l>
+               <l n="35">ὅς γʼ ἐξέλυσας ἄστυ Καδμεῖον μολὼν</l>
+               <l n="36">σκληρᾶς ἀοιδοῦ δασμὸν ὃν παρείχομεν,</l>
+               <l n="37">καὶ ταῦθʼ ὑφʼ ἡμῶν οὐδὲν ἐξειδὼς πλέον</l>
+               <l n="38">οὐδʼ ἐκδιδαχθείς, ἀλλὰ προσθήκῃ θεοῦ</l>
+               <l n="39">λέγει νομίζει θʼ ἡμὶν ὀρθῶσαι βίον·</l>
+               <l n="40">νῦν τʼ, ὦ κράτιστον πᾶσιν Οἰδίπου κάρα,</l>
+               <l n="41">ἱκετεύομέν σε πάντες οἵδε πρόστροποι</l>
+               <l n="42">ἀλκήν τινʼ εὑρεῖν ἡμίν, εἴτε του θεῶν</l>
+               <l n="43">φήμην ἀκούσας εἴτʼ ἀπʼ ἀνδρὸς οἶσθά του·</l>
+               <l n="44">ὡς τοῖσιν ἐμπείροισι καὶ τὰς ξυμφορὰς</l>
+               <l n="45">ζώσας ὁρῶ μάλιστα τῶν βουλευμάτων.</l>
+               <l n="46">ἴθʼ, ὦ βροτῶν ἄριστʼ, ἀνόρθωσον πόλιν,</l>
+               <l n="47">ἴθʼ, εὐλαβήθηθʼ· ὡς σὲ νῦν μὲν ἥδε γῆ</l>
+               <l n="48">σωτῆρα κλῄζει τῆς πάρος προθυμίας·</l>
+               <l n="49">ἀρχῆς δὲ τῆς σῆς μηδαμῶς μεμνώμεθα</l>
+               <l n="50">στάντες τʼ  ἐς ὀρθὸν καὶ πεσόντες ὕστερον.</l>
+               <l n="51">ἀλλʼ ἀσφαλείᾳ τήνδʼ ἀνόρθωσον πόλιν·</l>
+               <l n="52">ὄρνιθι γὰρ καὶ τὴν τότʼ αἰσίῳ τύχην</l>
+               <l n="53">παρέσχες ἡμῖν, καὶ τανῦν ἴσος γενοῦ.</l>
+               <l n="54">ὡς εἴπερ ἄρξεις τῆσδε γῆς, ὥσπερ κρατεῖς,</l>
+               <l n="55">ξὺν ἀνδράσιν κάλλιον ἢ κενῆς κρατεῖν·</l>
+               <l n="56">ὡς οὐδέν ἐστιν οὔτε πύργος οὔτε ναῦς</l>
+               <l n="57">ἔρημος ἀνδρῶν μὴ ξυνοικούντων ἔσω.</l>
+            </sp>
+            <milestone unit="card" resp="p" n="58"/>
+            <sp>
+               <speaker>Οἰδίπους</speaker>
+               <l n="58">ὦ παῖδες οἰκτροί, γνωτὰ κοὐκ ἄγνωτά μοι</l>
+               <l n="59">προσήλθεθʼ ἱμείροντες·  εὖ γὰρ οἶδʼ ὅτι</l>
+               <l n="60">νοσεῖτε πάντες, καὶ νοσοῦντες, ὡς ἐγὼ</l>
+</sp></div></div></body></text></TEI>

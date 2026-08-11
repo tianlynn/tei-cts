@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Homer, Odyssey — urn:cts:greekLit:tlg0012.tlg002.perseus-grc2
+  Excerpt trimmed for testing. Licensed CC BY-SA 4.0; see ATTRIBUTION.md.
+-->
+<?xml-model href="https://epidoc.stoa.org/schema/latest/tei-epidoc.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+   <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title xml:lang="grc">Ὀδύσσεια</title>
+            <author>Homer</author>
+            <editor>Augustus Taber Murray</editor>
+            <sponsor>Perseus Project, Tufts University</sponsor>
+            <principal>Gregory Crane</principal>
+            <respStmt>
+               <resp>Prepared under the supervision of</resp>
+               <name>Lisa Cerrato</name>
+               <name>William Merrill</name>
+               <name>Elli Mylonas</name>
+               <name>David Smith</name>
+            </respStmt>
+            <funder n="org:AnnCPB">The Annenberg CPB/Project</funder>
+         </titleStmt>
+         <extent>about 419Kb</extent>
+         <publicationStmt>
+            <publisher>Trustees of Tufts University</publisher>
+            <pubPlace>Medford, MA</pubPlace>
+            <authority>Perseus Project</authority>
+         </publicationStmt>
+         <notesStmt>
+            <note anchored="true" place="unspecified">Text scanned at U. Chicago in 1989. Basic SGML
+               tagging by Lauren Burka and Chiara Thayer.</note>
+         </notesStmt>
+         <sourceDesc>
+            <biblStruct>
+               <monogr>
+                  <author>Homer</author>
+                  <title>The Odyssey</title>
+                  <title type="sub">with an English Translation</title>
+                  <editor>A. T. Murray</editor>
+                  <imprint>
+                     <pubPlace>London</pubPlace>
+                     <publisher>William Heinemann, Ltd.</publisher>
+                     <pubPlace>New York</pubPlace>
+                     <publisher>G.P. Putnam's Sons</publisher>
+                     <date>1919</date>
+                  </imprint>
+                  <biblScope unit="volume">1-2</biblScope>
+               </monogr>
+               <series>
+                  <title>Loeb Classical Library</title>                        
+               </series>
+               <ref target="http://www.archive.org/details/odysseymurray01homeuoft">Internet Archive</ref><!-- Volume 1 -->
+               <ref target="http://hdl.handle.net/2027/uc1.$b318748">HathiTrust</ref><!-- Volume 2 -->
+            </biblStruct>           
+         </sourceDesc>
+      </fileDesc>
+      <encodingDesc>
+         <refsDecl n="CTS">
+            <cRefPattern n="line" matchPattern="(\w+).(\w+)"
+               replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[position()=$1]//tei:l[contains(@n,'$2')])">
+               <p>This pointer pattern extracts Book and Line</p>
+            </cRefPattern>
+            <cRefPattern n="book" matchPattern="(\w+)"
+               replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+               <p>This pointer pattern extracts Book</p>
+            </cRefPattern>
+         </refsDecl>
+         <refsDecl>
+            <refState delim="." unit="book"/>
+            <refState unit="card"/>
+         </refsDecl>
+         <refsDecl>
+            <refState unit="book" delim="."/>
+            <refState unit="line"/>
+         </refsDecl>
+      </encodingDesc>
+      <profileDesc>
+         <langUsage>
+            <language ident="grc">Greek</language>
+            <language ident="eng">English</language>
+         </langUsage>
+      </profileDesc>
+      <revisionDesc>
+         <change when="19901001" who="Nancy Sultan">Put in card breaks.</change>
+         <change when="19910801" who="EM">Revise DTDs and recheck texts.</change>
+         <change when="20151216" who="Bridget Almas">Converted to EpiDoc</change>
+         <change when="20151216" who="Bridget Almas">Bumped URN</change>
+         <change when="2016-02-10" who="Lisa Cerrato">numerous typos</change>
+      </revisionDesc>
+   </teiHeader>
+   <text>
+      <body>
+         <div type="edition" n="urn:cts:greekLit:tlg0012.tlg002.perseus-grc2" xml:lang="grc">
+            <div n="1" type="textpart" subtype="book">
+               <milestone n="1" unit="card" ed="p"/>
+               <l n="1">ἄνδρα μοι ἔννεπε, μοῦσα, πολύτροπον, ὃς μάλα πολλὰ</l>
+               <l n="2">πλάγχθη, ἐπεὶ Τροίης ἱερὸν πτολίεθρον ἔπερσεν·</l>
+               <l n="3">πολλῶν δʼ ἀνθρώπων ἴδεν ἄστεα καὶ νόον ἔγνω,</l>
+               <l n="4">πολλὰ δʼ ὅ γʼ ἐν πόντῳ πάθεν ἄλγεα ὃν κατὰ θυμόν,</l>
+               <l n="5">ἀρνύμενος ἥν τε ψυχὴν καὶ νόστον ἑταίρων.</l>
+               <l n="6">ἀλλʼ οὐδʼ ὣς ἑτάρους ἐρρύσατο, ἱέμενός περ·</l>
+               <l n="7">αὐτῶν γὰρ σφετέρῃσιν ἀτασθαλίῃσιν ὄλοντο,</l>
+               <l n="8">νήπιοι, οἳ κατὰ βοῦς Ὑπερίονος Ἠελίοιο</l>
+               <l n="9">ἤσθιον· αὐτὰρ ὁ τοῖσιν ἀφείλετο νόστιμον ἦμαρ.</l>
+               <l n="10">τῶν ἁμόθεν γε, θεά, θύγατερ Διός, εἰπὲ καὶ ἡμῖν.</l>
+               <l n="11">
+                  <milestone unit="para" ed="P"/>ἔνθʼ ἄλλοι μὲν πάντες, ὅσοι φύγον αἰπὺν
+                  ὄλεθρον,</l>
+               <l n="12">οἴκοι ἔσαν, πόλεμόν τε πεφευγότες ἠδὲ θάλασσαν·</l>
+               <l n="13">τὸν δʼ οἶον νόστου κεχρημένον ἠδὲ γυναικὸς</l>
+               <l n="14">νύμφη πότνιʼ ἔρυκε Καλυψὼ δῖα θεάων</l>
+               <l n="15">ἐν σπέσσι γλαφυροῖσι, λιλαιομένη πόσιν εἶναι.</l>
+               <l n="16">ἀλλʼ ὅτε δὴ ἔτος ἦλθε περιπλομένων ἐνιαυτῶν,</l>
+               <l n="17">τῷ οἱ ἐπεκλώσαντο θεοὶ οἶκόνδε νέεσθαι</l>
+               <l n="18">εἰς Ἰθάκην, οὐδʼ ἔνθα πεφυγμένος ἦεν ἀέθλων</l>
+               <l n="19">καὶ μετὰ οἷσι φίλοισι. θεοὶ δʼ ἐλέαιρον ἅπαντες</l>
+               <l n="20">νόσφι Ποσειδάωνος· ὁ δʼ ἀσπερχὲς μενέαινεν</l>
+               <l n="21">ἀντιθέῳ Ὀδυσῆι πάρος ἣν γαῖαν ἱκέσθαι.</l>
+               <l n="22">
+                  <milestone unit="para" ed="P"/>ἀλλʼ ὁ μὲν Αἰθίοπας μετεκίαθε τηλόθʼ ἐόντας,</l>
+               <l n="23">Αἰθίοπας τοὶ διχθὰ δεδαίαται, ἔσχατοι ἀνδρῶν,</l>
+               <l n="24">οἱ μὲν δυσομένου Ὑπερίονος οἱ δʼ ἀνιόντος,</l>
+               <l n="25">ἀντιόων ταύρων τε καὶ ἀρνειῶν ἑκατόμβης.</l>
+               <l n="26">ἔνθʼ ὅ γʼ ἐτέρπετο δαιτὶ παρήμενος· οἱ δὲ δὴ ἄλλοι</l>
+               <l n="27">Ζηνὸς ἐνὶ μεγάροισιν Ὀλυμπίου ἁθρόοι ἦσαν.</l>
+               <l n="28">τοῖσι δὲ μύθων ἦρχε πατὴρ ἀνδρῶν τε θεῶν τε·</l>
+               <l n="29">μνήσατο γὰρ κατὰ θυμὸν ἀμύμονος Αἰγίσθοιο,</l>
+               <l n="30">τόν ῥʼ Ἀγαμεμνονίδης τηλεκλυτὸς ἔκτανʼ Ὀρέστης·</l>
+               <l n="31">τοῦ ὅ γʼ ἐπιμνησθεὶς ἔπεʼ ἀθανάτοισι μετηύδα·</l>
+               <q type="unspecified">
+                  <l n="32">
+                     <milestone unit="para" ed="P"/>ὢ πόποι, οἷον δή νυ θεοὺς βροτοὶ αἰτιόωνται·</l>
+                  <l n="33">ἐξ ἡμέων γάρ φασι κάκʼ ἔμμεναι, οἱ δὲ καὶ αὐτοὶ</l>
+                  <l n="34">σφῇσιν ἀτασθαλίῃσιν ὑπὲρ μόρον ἄλγεʼ ἔχουσιν,</l>
+                  <l n="35">ὡς καὶ νῦν Αἴγισθος ὑπὲρ μόρον Ἀτρεΐδαο</l>
+                  <l n="36">γῆμʼ ἄλοχον μνηστήν, τὸν δʼ ἔκτανε νοστήσαντα,</l>
+                  <l n="37">εἰδὼς αἰπὺν ὄλεθρον, ἐπεὶ πρό οἱ εἴπομεν ἡμεῖς,</l>
+                  <l n="38">Ἑρμείαν πέμψαντες, ἐύσκοπον ἀργεϊφόντην,</l>
+                  <l n="39">μήτʼ αὐτὸν κτείνειν μήτε μνάασθαι ἄκοιτιν·</l>
+                  <l n="40">ἐκ γὰρ Ὀρέσταο τίσις ἔσσεται Ἀτρεΐδαο,</l>
+</q></div></div></body></text></TEI>

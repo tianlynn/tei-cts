@@ -1,0 +1,157 @@
+<?xml-model href="http://www.stoa.org/epidoc/schema/8.21/tei-epidoc.rng"
+                         schematypens="http://relaxng.org/ns/structure/1.0"?>
+<!--
+  Vergil, Aeneid — urn:cts:latinLit:phi0690.phi003.perseus-lat2
+  Excerpt trimmed for testing. Licensed CC BY-SA 4.0; see ATTRIBUTION.md.
+-->
+<?xml-model href="http://www.stoa.org/epidoc/schema/8.21/tei-epidoc.rng"
+                         schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Aeneid</title>
+                <author>P. Vergilius Maro</author>
+                <editor>J. B. Greenough</editor>
+                <principal>Gregory Crane</principal>
+                <respStmt>
+                    <resp>Prepared under the supervision of</resp>
+                    <name>Bridget Almas</name>
+                    <name>Lisa Cerrato</name>
+                    <name>William Merrill</name>
+                    <name>David Smith</name>
+                </respStmt>
+                <respStmt>
+                    <persName>Zach Himes</persName>
+                    <orgName>Tufts University</orgName>
+                    <resp>CTS and EpiDoc conversion</resp>
+                </respStmt>
+                <funder n="org:NEH">The National Endowment for the Humanities</funder>
+            </titleStmt>
+            <extent/>
+            <publicationStmt>
+                <publisher>Trustees of Tufts University</publisher>
+                <pubPlace>Medford, MA</pubPlace>
+                <authority>Perseus Project</authority>
+                <date type="release">1997-10-28</date>
+            </publicationStmt>
+            <sourceDesc>
+                <biblStruct>
+                    <monogr>
+                        <author>Vergil</author>
+                        <title>The Bucolics, Aeneid, and Georgics Of Virgil</title>
+                        <editor>J. B. Greenough</editor>
+                        <imprint>
+                            <pubPlace>Boston</pubPlace>
+                            <publisher>Ginn and Company</publisher>
+                            <date>1881</date>
+                        </imprint>
+                    </monogr>
+                    <ref target="https://hdl.handle.net/2027/uc1.a0000339325">HathiTrust</ref>                  
+                </biblStruct>
+            </sourceDesc>
+        </fileDesc>
+        
+        <encodingDesc>
+            <refsDecl n="CTS">
+                <cRefPattern n="line"
+                    matchPattern="(\w+).(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1']//tei:l[@n='$2'])">
+                    <p>This pointer pattern extracts book and line</p>
+                </cRefPattern>
+                <cRefPattern n="Book"
+                    matchPattern="(\w+)"
+                    replacementPattern="#xpath(/tei:TEI/tei:text/tei:body/tei:div/tei:div[@n='$1'])">
+                    <p>This pointer pattern extracts book</p>
+                </cRefPattern>
+            </refsDecl>
+            <refsDecl>
+                <refState unit="book" delim="."/>
+                <refState unit="line"/>
+            </refsDecl>
+            <editorialDecl>
+                <quotation marks="none"/>
+            </editorialDecl>
+        </encodingDesc>	
+        <profileDesc>
+            <langUsage>
+                <language ident="lat">Latin</language>
+            </langUsage>
+        </profileDesc>
+        
+        <revisionDesc>
+            <change who="Lisa Cerrato" when="2019-09-08">readded indentation and removed quotation marks for tagging consistency. Irregularities may remain.</change>
+           <change when="2015-12-01" who="Thibault Clérice"> Fixed numbering issue. Line numbering was probably made using l@n (by group of 5, starting from last point every time). It did not take l@n@part into account. Fixed. So some numbers did change </change>
+           <change when="2015-08-14" who="Zach Himes">Converted from TEI edition at https://github.com/PerseusDL/canonical-latinLit/blob/master/data/phi0690/phi003/phi0690.phi003.perseus-lat1.xml Conversion involved: converting to CTS EpiDoc, converting div1 to div changed ldquo,rdquo,uuml,ouuml,iuml to corresponding correct characters. fixed gap at 12.732 </change>
+           <change when="1996-10-16" who="WM"> Mark up public domain text downloaded from Libellus; did diereses; pathetic lines tagged as L PART="Y"; needs line nos.</change>
+           <change when="2011-10-28" who="lcerrato"> fixed line number issue 795 appeared twice </change>    
+           <change when="2011-01-17" who="gcrane"> base SDL files </change>
+<change when="2010-07-13" who="lcerrato"> 2.338 ullo fremitus changed to quo fremitus verified against source </change>
+<change when="2009-12-09" who="rsingh04"> moved more xml files around based on copyright status </change>
+ <change when="2009-01-12" who="rsingh04"> commented out extra chunking scheme </change>
+<change when="2005-10-18" who="lcerrato"> candientem on 12.91 changed to candentem based on user report and PHI </change>
+<change when="2005-08-01" who="packel"> removed stray item tags </change>
+<change when="2005-07-25" who="packel"> Converted to XML </change> 
+            <change when="2005-03-23" who="lcerrato"> changed visus line 10.447 to visu based on multiple sources </change> <change when="2004-04-02" who="mimno"> added line 1 cards </change> 
+            <change when="2003-07-01" who="yorkc"> Updated texts to TEI P4 and Perseus P4 extensions; minor cleanup (esp. character encodings and typos.) </change> 
+            <change when="2003-02-06" who="lcerrato"> fixed typo 5.627 eum freta to cum freta </change> 
+            <change when="2000-03-04" who="dasmith"> Added separate funder entity to TEI header </change> 
+            <change when="2000-02-22" who="textgod"> fixed multiple typos </change> 
+            <change when="1999-10-25" who="lcerrato"> fixed typo 1.90 </change> 
+            <change when="1999-10-16" who="lcerrato"> fixed typo </change> 
+            <change when="1999-08-04" who="textgod"> Turned line milestones into cards. </change> 
+            <change when="1999-08-04" who="textgod"> Remove TEXT N </change> 
+            <change when="1999-08-04" who="textgod"> Don't use [lr]sqb. </change> 
+            <change when="1999-08-04" who="textgod"> Fixed typos. </change> 
+            <change when="1997-09-24" who="textgod"> Changed names and redid headers. </change>
+        </revisionDesc>
+    </teiHeader>
+<text xml:lang="lat" >
+    <body>
+        <div type="edition"  xml:lang="lat" n="urn:cts:latinLit:phi0690.phi003.perseus-lat2" subtype="book">
+<div n="1" type="textpart" subtype="book">
+<milestone ed="p" n="1" unit="card"/>
+<l n="1" rend="indent">Arma virumque cano, Troiae qui primus ab oris</l>
+<l n="2">Italiam, fato profugus, Laviniaque venit</l>
+<l n="3">litora, multum ille et terris iactatus et alto</l>
+<l n="4">vi superum saevae memorem Iunonis ob iram;</l>
+<l n="5">multa quoque et bello passus, dum conderet urbem,</l>
+<l n="6">inferretque deos Latio, genus unde Latinum,</l>
+<l n="7">Albanique patres, atque altae moenia Romae.</l>
+<milestone ed="p" n="8" unit="card"/>
+<l n="8" rend="indent">Musa, mihi causas memora, quo numine laeso,</l>
+<l n="9">quidve dolens, regina deum tot volvere casus</l>
+<l n="10">insignem pietate virum, tot adire labores</l>
+<l n="11">impulerit. Tantaene animis caelestibus irae?</l>
+<milestone ed="p" n="12" unit="card"/>
+<l n="12" rend="indent">Urbs antiqua fuit, Tyrii tenuere coloni,</l>
+<l n="13">Karthago, Italiam contra Tiberinaque longe</l>
+<l n="14">ostia, dives opum studiisque asperrima belli;</l>
+<l n="15">quam Iuno fertur terris magis omnibus unam</l>
+<l n="16">posthabita coluisse Samo; hic illius arma,</l>
+<l n="17">hic currus fuit; hoc regnum dea gentibus esse,</l>
+<l n="18">si qua fata sinant, iam tum tenditque fovetque.</l>
+<l n="19">Progeniem sed enim Troiano a sanguine duci</l>
+<l n="20">audierat, Tyrias olim quae verteret arces;</l>
+<l n="21">hinc populum late regem belloque superbum</l>
+<l n="22">venturum excidio Libyae: sic volvere Parcas.</l>
+<l n="23">Id metuens, veterisque memor Saturnia belli,</l>
+    <l n="24">prima quod ad Troiam pro caris gesserat Argis—</l>
+<l n="25">necdum etiam causae irarum saevique dolores</l>
+<l n="26">exciderant animo: manet alta mente repostum</l>
+<l n="27">iudicium Paridis spretaeque iniuria formae,</l>
+<l n="28">et genus invisum, et rapti Ganymedis honores.</l>
+<l n="29">His accensa super, iactatos aequore toto</l>
+<l n="30">Troas, reliquias Danaum atque immitis Achilli,</l>
+<l n="31">arcebat longe Latio, multosque per annos</l>
+<l n="32">errabant, acti fatis, maria omnia circum.</l>
+<l n="33">Tantae molis erat Romanam condere gentem!</l>
+<milestone ed="p" n="34" unit="card"/>
+<l n="34" rend="indent">Vix e conspectu Siculae telluris in altum</l>
+<l n="35">vela dabant laeti, et spumas salis aere ruebant,</l>
+<l n="36">cum Iuno, aeternum servans sub pectore volnus,</l>
+<l n="37">haec secum: <q>Mene incepto desistere victam,</q></l>
+<l n="38"><q rend="merge">nec posse Italia Teucrorum avertere regem?</q></l>
+    <l n="39"><q rend="merge">Quippe vetor fatis. Pallasne exurere classem</q></l>
+    <l n="40"><q rend="merge">Argivum atque ipsos potuit submergere ponto,</q></l>
+</div></div></body></text></TEI>
