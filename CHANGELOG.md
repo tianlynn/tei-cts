@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0] — unreleased
+## [0.2.0]
 
 ### Added
 
@@ -97,9 +97,9 @@ All notable changes to this project are documented here. The format follows
   loose text is not emitted, since emitting the parent too would duplicate its children. Usually zero,
   but a few percent in editions that set poetry beside numbered prose verses.
 
-## [0.1.0] — unreleased
+## [0.1.0]
 
-First release. The API is expected to move while it meets its first real consumers, hence `0.x`.
+The initial API, against which 0.2.0's **Changed** section reads.
 
 ### Added
 

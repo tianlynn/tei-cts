@@ -1,0 +1,58 @@
+name: Release
+
+# Publish on a version tag. See .github/RELEASING.md.
+#
+# Requires a repository secret NPM_TOKEN — an npm automation token, which works
+# with 2FA enabled on the account. Alternatively configure npm trusted
+# publishing for this repo and drop the NODE_AUTH_TOKEN line.
+
+on:
+  push:
+    tags: ['v*']
+  # Allows a dry run against any ref without publishing anything.
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required for npm provenance.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+
+      - name: Check the tag matches package.json
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tagged="${GITHUB_REF_NAME#v}"
+          declared="$(node -p "require('./package.json').version")"
+          if [ "$tagged" != "$declared" ]; then
+            echo "tag v$tagged does not match package.json version $declared" >&2
+            exit 1
+          fi
+          echo "releasing $declared"
+
+      # The same gate CI runs, repeated here rather than assumed: a tag can be
+      # pushed at a commit whose CI never ran, or ran and was ignored.
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm test
+      - run: npx publint
+      - run: npx --yes @arethetypeswrong/cli --pack --profile esm-only
+
+      # Without a tag this stops here, having proved the release would work.
+      - name: Publish
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

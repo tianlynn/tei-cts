@@ -47,6 +47,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm test",
     "corpus": "npm run build && npm run corpus:fetch && npm run corpus:run && npm run corpus:report && npm run corpus:manifest",
     "corpus:fetch": "node tools/corpus/fetch.mjs",
     "corpus:run": "node tools/corpus/run.mjs",
