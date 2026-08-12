@@ -2,7 +2,17 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
-    "rootDir": "src"
+    "rootDir": "src",
+    // No maps in the published package. They would point at `../src/*.ts`, which
+    // is not in `files`, so they resolve to nothing on an installed copy — and
+    // embedding the sources to fix that would double the tarball to buy almost
+    // nothing. Maps earn their keep when the shipped artifact is unreadable:
+    // minified, bundled, heavily downlevelled. This one is the source with the
+    // type annotations removed, same identifiers and same structure, so a trace
+    // into `dist/parse.js` lands on the code you would have read anyway.
+    // The base config keeps both on, for editors and the test run.
+    "sourceMap": false,
+    "declarationMap": false
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/fixtures.ts"]
